@@ -1,32 +1,3 @@
-.. You should enable this project on travis-ci.org and coveralls.io to make
-   these badges work. The necessary Travis and Coverage config files have been
-   generated for you.
-
-.. image:: https://travis-ci.org/geosolutions-it/ckanext-faociok.svg?branch=master
-    :target: https://travis-ci.org/geosolutions-it/ckanext-faociok
-
-.. image:: https://coveralls.io/repos/geosolutions-it/ckanext-faociok/badge.svg
-  :target: https://coveralls.io/r/geosolutions-it/ckanext-faociok
-
-.. image:: https://pypip.in/download/ckanext-faociok/badge.svg
-    :target: https://pypi.python.org/pypi//ckanext-faociok/
-    :alt: Downloads
-
-.. image:: https://pypip.in/version/ckanext-faociok/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-faociok/
-    :alt: Latest Version
-
-.. image:: https://pypip.in/py_versions/ckanext-faociok/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-faociok/
-    :alt: Supported Python versions
-
-.. image:: https://pypip.in/status/ckanext-faociok/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-faociok/
-    :alt: Development Status
-
-.. image:: https://pypip.in/license/ckanext-faociok/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-faociok/
-    :alt: License
 
 =============
 ckanext-faociok
