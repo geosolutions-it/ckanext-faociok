@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import ckanext.dcatapit.interfaces as interfaces
 
 from ckan.common import _, ungettext
 from ckan.plugins import PluginImplementations
-from ckanext.faociok.models import get_datatypes()
+from ckanext.faociok.models import Vocabulary
 
 
 def _get_package_schema():
@@ -13,8 +12,8 @@ def _get_package_schema():
         {'name': 'datatype',
          'validator': ['fao_datatype'],
          'element': 'select',
-         'values': get_datatypes(),
          'label': _("Data type"),
+         'vocabulary_name': Vocabulary.VOCABULARY_DATATYPE,
          'description': _("Select data type of dataset"),
          'is_required': True,
          },

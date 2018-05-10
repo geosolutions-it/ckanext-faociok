@@ -64,7 +64,9 @@ class VocabularyCommands(CkanCommand):
 
         syntax: load vocabulary_name path_to_source_file
         """
-        load_vocabulary(vocabulary_name, path)
+        with open(path, 'rt') as f:
+            count = load_vocabulary(vocabulary_name, f)
+            print('loaded {} terms from {} to {} vocabulary'.format(count, path, vocabulary_name))
 
     def get_commands(self):
         """

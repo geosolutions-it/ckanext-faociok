@@ -22,6 +22,8 @@ DeclarativeBase = declarative_base(metadata=meta.metadata)
 
 
 class Vocabulary(DeclarativeBase):
+    VOCABULARY_DATATYPE = 'datatype'
+
     __tablename__ = 'faociok_vocabulary'
     id = Column(types.Integer, primary_key=True)
     name = Column(types.Unicode, unique=True)
@@ -48,7 +50,20 @@ class Vocabulary(DeclarativeBase):
         return inst
 
     def clear(self):
-        self.terms.clear()
+        q = Session.query(VocabularyLabel)\
+                   .join(VocabularyTerm)\
+                   .filter(VocabularyTerm.vocabulary_id==self.id)
+
+        for vl in q:
+            Session.delete(vl)
+
+        q = Session.query(VocabularyTerm)\
+                   .filter(VocabularyTerm.vocabulary_id==self.id)
+
+        for vl in q:
+            Session.delete(vl)
+        Session.flush()
+
 
     @classmethod
     def get_all(cls):
@@ -101,14 +116,16 @@ class VocabularyTerm(DeclarativeBase):
     @classmethod
     def get_terms_q(cls, vocabulary_name, lang):
         s = Session
-        q = s.query(cls.name, VocabularyLabel.label).join(Vocabulary, Vocabulary.name==vocabulary_name)\
-                                                    .outerjoin(VocabularyLabel, VocabularyLabel.lang==lang)
+        q = s.query(cls.name, VocabularyLabel.label).join(Vocabulary)\
+                                                    .outerjoin(VocabularyLabel)\
+                                                    .filter(Vocabulary.name==vocabulary_name,
+                                                            VocabularyLabel.lang==lang)
         return q
     
     @classmethod
     def get_terms(cls, vocabulary_name, lang):
         q = cls.get_terms_q(vocabulary_name, lang)
-        return [item[1] or item[0] for item in q]
+        return [(item[0], item[1] or item[0],) for item in q]
 
 
 class VocabularyLabel(DeclarativeBase):
@@ -140,39 +157,75 @@ def setup_models():
             t.create()
 
 
-def load_vocabulary(vocabulary_name, fpath, **vocab_config):
+def load_vocabulary(vocabulary_name, fh, **vocab_config):
+    """
+    Load Vocabulary terms and lang values
+
+    fh is a file-like object containing csv data in format:
+     * first row contains header with values
+       * term, $languagecode,...
+       or 
+       * parent, term, $languagecode..
+     * each next row contains values:
+       
+     For example:
+
+        term,en,it,de,fr
+        microdata,Microdata,,,
+        geospatial-data,Geospatial data,,,
+
+     or:
+
+
+        parent,term,en,it,de,fr
+        ,microdata,Microdata,,,
+        microdata,geospatial-data,Geospatial data,,,
+
+    @param vocabulary_name Vocabulary instance or name of vocabulary
+    @param file-like object with terms data
+
+    @rtype int number of terms loaded
+    """
     try:
         vocab = Vocabulary.get(vocabulary_name)
         vocab.clear()
     except ValueError:
         vocab = Vocabulary.create(vocabulary_name, **vocab_config)
     
-    with open(fpath, 'rt') as fh:
-        r = csv.reader(fh)
+    
+    r = csv.reader(fh)
+    counter = 0
+    # first row is a header
+    header = list(r.next())
 
-        # first row is a header
-        header = list(r.next())
-        headers = header
-        parent_name = None
-        default = headers[0]
+    # row offset for data, default 1, as column 0 has term.name
+    row_offset = 1
+    # get headers with lang names
+    headers = header[row_offset:]
+    parent_name = None
+    default = 0
 
-        # establish if we have a parent
-        if header[0] == 'parent':
-            if not vocab.has_relations:
-                raise ValueError("Cannot use 'parent' colum if "
-                                 "vocabulary that doesn't "
-                                 "support relations")
-            default = header[1]
-            headers = header[1:]
-            parent_name = header[0]
-        
-        for row in r:
-            # per-term labels with header
-            labels = dict(zip(headers, row))
-            if not labels:
-                continue
-            parent = None
-            default_label = labels[default]
-            if parent_name:
-                parent = VocabularyTerm.get(vocab, parent_name)
-            VocabularyTerm.create(vocab, default_label, labels, parent=parent)
+    # establish if we have a parent
+    if header[0] == 'parent':
+        if not vocab.has_relations:
+            raise ValueError("Cannot use 'parent' colum if "
+                             "vocabulary that doesn't "
+                             "support relations")
+        row_offset = 2
+        default = 1
+        headers = header[row_offset:]
+        parent_name = header[0]
+    
+    for row in r:
+        # per-term labels with header
+        labels = dict(zip(headers, row[row_offset:]))
+        if not labels:
+            continue
+
+        parent = None
+        default_label = row[default]
+        if parent_name:
+            parent = VocabularyTerm.get(vocab, parent_name)
+        VocabularyTerm.create(vocab, default_label, labels, parent=parent)
+        counter += 1
+    return counter
