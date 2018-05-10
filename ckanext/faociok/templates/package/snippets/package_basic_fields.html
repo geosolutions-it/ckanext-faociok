@@ -3,5 +3,6 @@
 {% set pkg_fields = h.get_faociok_package_schema() %}
 
 {% block package_basic_fields_custom %}
+    {{ super() }}
 	{% snippet 'package/snippets/faociok_form_fields.html', data=data, errors=errors, schema_fields=pkg_fields %}
 {% endblock %}

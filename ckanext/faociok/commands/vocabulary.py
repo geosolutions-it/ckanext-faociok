@@ -5,6 +5,7 @@ from __future__ import print_function
 import logging
 import traceback
 
+from ckan.common import _, ungettext
 import ckan.plugins.toolkit as toolkit
 
 from pylons import config
@@ -36,10 +37,10 @@ class VocabularyCommands(CkanCommand):
         """
         List vocabularies
         """
-        print('vocabularies:')
+        print(_('vocabularies:'))
         for voc in Vocabulary.get_all():
-            print('vocabulary name: {}'.format(voc.name))
-            print('  has relations: {}'.format(voc.has_relations))
+            print(_('vocabulary name: {}').format(voc.name))
+            print(_('  has relations: {}').format(voc.has_relations))
             print()
 
     def cmd_create(self, vocabulary_name, has_relations=False, *args, **kwargs):
@@ -66,7 +67,7 @@ class VocabularyCommands(CkanCommand):
         """
         with open(path, 'rt') as f:
             count = load_vocabulary(vocabulary_name, f)
-            print('loaded {} terms from {} to {} vocabulary'.format(count, path, vocabulary_name))
+            print(_('loaded {} terms from {} to {} vocabulary').format(count, path, vocabulary_name))
 
     def get_commands(self):
         """
@@ -84,7 +85,7 @@ class VocabularyCommands(CkanCommand):
         try:
             cmd = self.args[0]
         except IndexError:
-            print("ERROR: missing command")
+            print(_("ERROR: missing command"))
             print(self.usage)
             return
 
@@ -92,7 +93,7 @@ class VocabularyCommands(CkanCommand):
 
         commands = self.get_commands()
         if not cmd in commands:
-            print("ERROR: invalid command: {}".format(cmd))
+            print(_("ERROR: invalid command: {}").format(cmd))
             print(self.usage)
             return
         callable = commands[cmd]
@@ -101,8 +102,8 @@ class VocabularyCommands(CkanCommand):
             Session.commit()
             return out
         except Exception, err:
-            log.error("Can't execute %s with args %s: %s", cmd, self.args[1:], err, exc_info=err)
+            log.error(_("Can't execute %s with args %s: %s"), cmd, self.args[1:], err, exc_info=err)
             traceback.print_exc(err)
-            print("Can't execute {} with args {}: {}".format(cmd, self.args[1:], err))
+            print(_("Can't execute {} with args {}: {}").format(cmd, self.args[1:], err))
             print(self.command_usage(cmd, callable))
             return

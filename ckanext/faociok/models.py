@@ -5,6 +5,7 @@ import logging
 
 import csv
 
+from ckan.common import _, ungettext
 from sqlalchemy import types, Column, ForeignKey, Index, Table
 from sqlalchemy import orm, and_, or_
 from sqlalchemy.exc import SQLAlchemyError as SAError
@@ -35,6 +36,10 @@ class Vocabulary(DeclarativeBase):
         self.name = name
         self.has_relations = has_relations
 
+    def valid_term(self, term):
+        q = Session.query(VocabularyTerm).filter(VocabularyTerm.name==term)
+        return Session.query(q.exists())
+
     @classmethod
     def create(cls, name, has_relations=False):
         inst = cls(name=name, has_relations=False)
@@ -46,7 +51,7 @@ class Vocabulary(DeclarativeBase):
     def get(cls, name):
         inst = Session.query(cls).filter_by(name=name).first()
         if not inst:
-            raise ValueError("Vocabulary {} doesn't exist".format(name))
+            raise ValueError(_("Vocabulary {} doesn't exist").format(name))
         return inst
 
     def clear(self):
@@ -94,12 +99,20 @@ class VocabularyTerm(DeclarativeBase):
         for k, v in labels.items():
             VocabularyLabel.create(self, lang=k, label=v)
 
+    def get_label(self, lang):
+        return Session.query(VocabularyLabel).filter(VocabularyLabel.term_id==self.id,
+                                                     VocabularyLabel.lang==lang).first()
     
     @classmethod
     def get(cls, vocab, name):
-        item = Session.query(cls).filter(vocabulary_id==vocab.id, name==name).first()
+        if isinstance(vocab, Vocabulary):
+            item = Session.query(cls).filter(vocabulary_id==vocab.id, cls.name==name).first()
+        else:
+            item = Session.query(cls).join(Vocabulary)\
+                                     .filter(Vocabulary.name==vocab, cls.name==name).first()
+
         if not item:
-            raise ValueError("No term {} for vocabulary {}".format(name, vocab))
+            raise ValueError(_("No term {} for vocabulary {}").format(name, vocab))
         return item
 
     @classmethod
@@ -208,9 +221,9 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
     # establish if we have a parent
     if header[0] == 'parent':
         if not vocab.has_relations:
-            raise ValueError("Cannot use 'parent' colum if "
-                             "vocabulary that doesn't "
-                             "support relations")
+            raise ValueError(_("Cannot use 'parent' colum if "
+                               "vocabulary that doesn't "
+                               "support relations"))
         row_offset = 2
         default = 1
         headers = header[row_offset:]
