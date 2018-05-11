@@ -23,7 +23,6 @@ def _get_package_schema():
 def get_create_package_schema():
     return dict( (i['name'], i['validators'],) for i in _get_package_schema())
 
-
 def get_update_package_schema():
     return dict( (i['name'], i['validators'],) for i in _get_package_schema())
 

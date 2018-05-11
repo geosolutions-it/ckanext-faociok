@@ -11,7 +11,7 @@
           <tr>
             <th scope="row" class="dataset-label">{{ field.label }}</th>
             <td class="dataset-details">
-                {{ pkg_dict[field.name] }}
+                {{ h.get_fao_datatype(pkg_dict[field.name]) }}
             </td>
           </tr>
         {% endif %}
