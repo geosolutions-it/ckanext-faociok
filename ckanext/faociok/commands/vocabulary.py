@@ -4,6 +4,8 @@ from __future__ import print_function
 
 import logging
 import traceback
+from cStringIO import StringIO
+from openpyxl import load_workbook
 
 from ckan.common import _, ungettext
 import ckan.plugins.toolkit as toolkit
@@ -68,6 +70,56 @@ class VocabularyCommands(CkanCommand):
         with open(path, 'rt') as f:
             count = load_vocabulary(vocabulary_name, f)
             print(_('loaded {} terms from {} to {} vocabulary').format(count, path, vocabulary_name))
+
+    def cmd_import_m49(self, vocabulary_name, in_file, *args, **kwargs):
+        """
+        Convert xlsx file with m49 data into vocabulary
+
+        syntax: import_m49 in_file
+        """
+        wb = load_workbook(in_file)
+        sheet = wb.active
+
+        level1_cells = (5,6,)
+        level1_parent_cell = None
+        level2_cells = (8,9,)
+        level2_parent_cell = 5
+        countries_cells = (1,2,3,)
+        countries_parent_cell = 8
+
+        countries = []
+        level1 = []
+        level2 = []
+        
+        # 
+        combine_data = ((countries_cells, countries_parent_cell, countries,),
+                        (level1_cells, level1_parent_cell, level1,),
+                        (level2_cells, level2_parent_cell, level2,))
+
+
+        
+        for row in sheet.iter_rows(min_row=6):
+            for indexes, parent_cell, container in combine_data:
+                # ( parent, data..)
+                rdata = []
+                if parent_cell is not None:
+                    rdata.append(row[parent_cell-1].value)
+                else:
+                    rdata.append(parent_cell)
+
+                for idx in indexes:
+                    value = row[idx-1].value
+                    rdata.append(value)
+                container.append(rdata)
+        for r in level1[:10]:
+            print(r)
+        for r in level2[:10]:
+            print(r)
+        for r in countries[:10]:
+            print(r)
+        
+        csvdata = StringIO()
+
 
     def get_commands(self):
         """

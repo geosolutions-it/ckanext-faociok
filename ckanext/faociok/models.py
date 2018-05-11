@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
+import json
 import csv
 
 from ckan.common import _, ungettext
@@ -81,10 +81,20 @@ class VocabularyTerm(DeclarativeBase):
     vocabulary_id = Column(types.Integer, ForeignKey(Vocabulary.id), nullable=False)
     parent_id = Column(types.Integer, ForeignKey('faociok_vocabulary_term.id'), nullable=True)
     name = Column(types.Unicode, nullable=False, unique=True)
+    # keep per-term custom properties
+    _properties = Column(types.Unicode, nullable=True)
 
     parent = orm.relationship('VocabularyTerm')
     children = orm.relationship('VocabularyTerm')
     labels = orm.relationship('VocabularyLabel')
+
+    @property
+    def properties(self):
+        return json.loads(self._properties or '{}')
+
+    @properties.setter
+    def properties_set(self, value):
+        self._properties = json.dumps(value)
 
     def __init__(self, vocabulary, name, parent=None):
         if isinstance(vocabulary, Vocabulary):
@@ -168,7 +178,6 @@ def setup_models():
               VocabularyLabel.__table__):
         if not t.exists():
             t.create()
-
 
 def load_vocabulary(vocabulary_name, fh, **vocab_config):
     """
