@@ -1,0 +1,93 @@
+# Translations template for ckanext-faociok.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the ckanext-faociok
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-faociok 0.0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-05-11 16:44+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: ckanext/faociok/models.py:54
+msgid "Vocabulary {} doesn't exist"
+msgstr ""
+
+#: ckanext/faociok/models.py:115
+msgid "No term {} for vocabulary {}"
+msgstr ""
+
+#: ckanext/faociok/models.py:224
+msgid "Cannot use 'parent' colum if vocabulary that doesn't support relations"
+msgstr ""
+
+#: ckanext/faociok/plugin.py:72 ckanext/faociok/schema.py:16
+msgid "Data type"
+msgstr ""
+
+#: ckanext/faociok/schema.py:18
+msgid "Select data type of dataset"
+msgstr ""
+
+#: ckanext/faociok/validators.py:12
+msgid "Term not valid"
+msgstr ""
+
+#: ckanext/faociok/validators.py:14
+msgid "Invalid datatype value: {}: {}"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:40
+msgid "vocabularies:"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:42
+msgid "vocabulary name: {}"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:43
+msgid "  has relations: {}"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:70
+msgid "loaded {} terms from {} to {} vocabulary"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:88
+msgid "ERROR: missing command"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:96
+msgid "ERROR: invalid command: {}"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:105
+#, python-format
+msgid "Can't execute %s with args %s: %s"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:107
+msgid "Can't execute {} with args {}: {}"
+msgstr ""
+
+#: ckanext/faociok/templates/macros/faociok_form_macros.html:11
+msgid "This field is required"
+msgstr ""
+
+#: ckanext/faociok/templates/macros/faociok_form_macros.html:11
+msgid "Custom"
+msgstr ""
+
+#: ckanext/faociok/templates/package/snippets/faociok_additional_info.html:2
+msgid "Dataset Metadata"
+msgstr ""
+
