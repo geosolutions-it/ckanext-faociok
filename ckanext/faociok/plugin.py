@@ -10,7 +10,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IValidators)
-    plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IFacets)
 
     # IConfigurer
 
@@ -67,22 +67,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_fao_datatype': h.get_fao_datatype,
         }
 
-    # IPackageController
-
-    def before_index(self, pkg_dict):
-        return pkg_dict
-
-    def before_view(self, pkg_dict):
-
-        # for cached data, move fao_datatype from extras to main dict
-        if not pkg_dict.get('fao_datatype'):
-            to_remove = None
-            for idx, ex in enumerate(pkg_dict.get('extras') or []):
-                if ex['key'] == 'fao_datatype':
-                    to_remove = idx
-                    pkg_dict[ex['key']] = ex['value']
-                    break
-            if to_remove is not None:
-                pkg_dict['extras'].pop(to_remove)
-        return pkg_dict
-
+    # IFacets
+    def dataset_facets(self, facets_dict, package_type):
+        facets_dict['fao_datatype'] = t._("Data type")
+        return facets_dict
