@@ -16,7 +16,8 @@ done
 
 for file in $DIR/groups/*.json; do
    echo = CREATE GROUP from file $file
-   curl -i -H "X-CKAN-API-Key: $APIKEY" -XPOST -d @$file http://$HOST/api/3/action/group_create
+   curl -vvv -H 'Content-Type: application/json;charset=utf-8' -H "X-CKAN-API-Key: $APIKEY" -XPOST -d @$file http://$HOST/api/3/action/group_create
+   echo
 done
 
 for file in $DIR/sources/*.json; do
