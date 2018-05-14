@@ -24,6 +24,7 @@ DeclarativeBase = declarative_base(metadata=meta.metadata)
 
 class Vocabulary(DeclarativeBase):
     VOCABULARY_DATATYPE = 'datatype'
+    VOCABULARY_M49_REGIONS = 'm49_regions'
 
     __tablename__ = 'faociok_vocabulary'
     id = Column(types.Integer, primary_key=True)
@@ -36,13 +37,17 @@ class Vocabulary(DeclarativeBase):
         self.name = name
         self.has_relations = has_relations
 
+    def __str__(self):
+        return 'Vocabulary({}{})'.format(self.name, 
+                                          ' with relations' if self.has_relations else '')
+
     def valid_term(self, term):
         q = Session.query(VocabularyTerm).filter(VocabularyTerm.name==term)
         return Session.query(q.exists())
 
     @classmethod
     def create(cls, name, has_relations=False):
-        inst = cls(name=name, has_relations=False)
+        inst = cls(name=name, has_relations=has_relations)
         Session.add(inst)
         Session.flush()
         return inst
@@ -93,17 +98,19 @@ class VocabularyTerm(DeclarativeBase):
         return json.loads(self._properties or '{}')
 
     @properties.setter
-    def properties_set(self, value):
+    def properties(self, value):
         self._properties = json.dumps(value)
 
-    def __init__(self, vocabulary, name, parent=None):
+    def __init__(self, vocabulary, name, parent=None, properties=None):
         if isinstance(vocabulary, Vocabulary):
             self.vocabulary_id = vocabulary.id
         else:
             self.vocabulary_id = vocabulary
         self.name = name
         if parent:
-            self.parent = parent
+            self.parent_id = parent.id
+        if properties is not None:
+            self.properties = properties
 
     def set_labels(self, labels):
         for k, v in labels.items():
@@ -116,7 +123,10 @@ class VocabularyTerm(DeclarativeBase):
     @classmethod
     def get(cls, vocab, name):
         if isinstance(vocab, Vocabulary):
-            item = Session.query(cls).filter(vocabulary_id==vocab.id, cls.name==name).first()
+            item = Session.query(cls).filter(cls.vocabulary_id==vocab.id,
+                                             cls.name==name)\
+                                     .first()
+
         else:
             item = Session.query(cls).join(Vocabulary)\
                                      .filter(Vocabulary.name==vocab, cls.name==name).first()
@@ -126,10 +136,10 @@ class VocabularyTerm(DeclarativeBase):
         return item
 
     @classmethod
-    def create(cls, vocab, name, labels=None, parent=None):
+    def create(cls, vocab, name, labels=None, parent=None, properties=None):
         if not isinstance(vocab, Vocabulary):
             vocab = Vocabulary.get(vocab)
-        inst = cls(vocab, name, parent)
+        inst = cls(vocab, name, parent, properties)
         Session.add(inst)
         Session.flush()
         if labels:
@@ -224,7 +234,7 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
     row_offset = 1
     # get headers with lang names
     headers = header[row_offset:]
-    parent_name = None
+    parent_idx = None
     default = 0
 
     # establish if we have a parent
@@ -236,18 +246,29 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         row_offset = 2
         default = 1
         headers = header[row_offset:]
-        parent_name = header[0]
+        parent_idx = 0
     
     for row in r:
-        # per-term labels with header
-        labels = dict(zip(headers, row[row_offset:]))
+        # all data for row
+        _data = dict(zip(headers, row[row_offset:]))
+        # properties are cells for which header starts with 'property:' prefix
+        properties = dict( (k[len('property:'):],v,) for k,v in _data.items() if k.startswith('property:'))
+        # labels are cells for which header starts with 'lang:'
+        labels = dict( (k,v,) for k,v in _data.items() if k.startswith('lang:'))
+
         if not labels:
             continue
-
         parent = None
         default_label = row[default]
-        if parent_name:
-            parent = VocabularyTerm.get(vocab, parent_name)
-        VocabularyTerm.create(vocab, default_label, labels, parent=parent)
+        try:
+            existing = VocabularyTerm.get(vocab, default_label)
+            continue
+        except ValueError:
+            pass
+        if parent_idx is not None:
+            parent_name = row[parent_idx] 
+            if parent_name:
+                parent = VocabularyTerm.get(vocab, parent_name)
+        VocabularyTerm.create(vocab, default_label, labels, parent=parent, properties=properties)
         counter += 1
     return counter

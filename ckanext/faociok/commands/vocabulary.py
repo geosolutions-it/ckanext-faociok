@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import logging
 import traceback
+import csv
 from cStringIO import StringIO
 from openpyxl import load_workbook
 
@@ -84,7 +85,7 @@ class VocabularyCommands(CkanCommand):
         level1_parent_cell = None
         level2_cells = (8,9,)
         level2_parent_cell = 5
-        countries_cells = (1,2,3,)
+        countries_cells = (1,3,2)
         countries_parent_cell = 8
 
         countries = []
@@ -109,16 +110,29 @@ class VocabularyCommands(CkanCommand):
 
                 for idx in indexes:
                     value = row[idx-1].value
+                    if isinstance(value, unicode):
+                        value = value.encode('utf-8')
                     rdata.append(value)
+                if not any(rdata):
+                    continue
                 container.append(rdata)
-        for r in level1[:10]:
-            print(r)
-        for r in level2[:10]:
-            print(r)
-        for r in countries[:10]:
-            print(r)
-        
+
         csvdata = StringIO()
+        w = csv.writer(csvdata)
+        w.writerow(['parent', 'name', 'lang:en', 'property:country_code'])
+        for r in level1:
+            w.writerow(r) 
+        for r in level2:
+            w.writerow(r)
+        for r in countries:
+            w.writerow(r)
+        csvdata.seek(0)
+        voc_name = Vocabulary.VOCABULARY_M49_REGIONS
+
+        voc = Vocabulary.create(voc_name, has_relations=True)
+
+        count = load_vocabulary(voc_name, csvdata)
+        print(_('loaded {} terms from {} to {} vocabulary').format(count, in_file, voc_name))
 
 
     def get_commands(self):
