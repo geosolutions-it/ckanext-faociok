@@ -17,7 +17,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IValidators)
-    plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IPackageController, inherit=True)
 
     # IConfigurer
@@ -91,7 +91,10 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     def dataset_facets(self, facets_dict, package_type):
         facets_dict['fao_datatype'] = t._("Data type")
         lang = get_lang()
-        facets_dict['fao_m49_regions_{}'.format(lang)] = t._("M49 Region")
+        for idx, l in enumerate([t._("M49 Level 1 Region"),
+                                 t._("M49 Level 2 Region"),
+                                 t._("M49 Country Level")]):
+            facets_dict['fao_m49_regions_l{}_{}'.format(idx, lang)] = l
         return facets_dict
 
     def get_localized_regions(self, regions):
@@ -101,7 +104,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             parent = v
             while parent:
                 for label in parent.labels:
-                    lname = 'fao_m49_regions_{}'.format(label.lang)
+                    lname = 'fao_m49_regions_l{}_{}'.format(parent.depth, label.lang)
                     try:
                         out[lname].add(label.label)
                     except KeyError:
