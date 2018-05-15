@@ -10,6 +10,9 @@ def get_fao_datatype(name):
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_DATATYPE, name)
     return term.get_label(lang).label or term.name
 
+def format_term(term, depth):
+    return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
+
 def get_vocabulary_items(vocabulary_name):
-    return [{'value': i[0], 'text': i[1]} for i in VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())]
+    return [{'value': i[0], 'text': format_term(i[1], i[2])} for i in VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())]
     

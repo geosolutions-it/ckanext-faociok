@@ -4,11 +4,14 @@
             {% if field.element == 'select' %}
             
                   {% set options = h.get_faociok_vocabulary_items(field.vocabulary_name) or field.options %}
+
                   {{ dform.select(field.name,
                                   label=field.label,
                                   options=options,
                                   selected=data[field.name],
                                   error=errors[field.name],
+                                  multiple=field.multiple,
+                                  use_autocomplete=field.autocomplete,
                                   is_required=field.is_required) }}
 
             {% endif %}

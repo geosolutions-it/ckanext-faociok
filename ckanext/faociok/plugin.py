@@ -11,6 +11,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets)
+    plugins.implements(plugins.IPackageController, inherit=True)
 
     # IConfigurer
 
@@ -56,6 +57,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     def get_validators(self):
         return {
             'fao_datatype': v.fao_datatype,
+            'fao_m49_regions': v.fao_m49_regions,
         }
 
     # ITemplateHelpers

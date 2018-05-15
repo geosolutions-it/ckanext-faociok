@@ -72,7 +72,7 @@ class VocabularyCommands(CkanCommand):
             count = load_vocabulary(vocabulary_name, f)
             print(_('loaded {} terms from {} to {} vocabulary').format(count, path, vocabulary_name))
 
-    def cmd_import_m49(self, vocabulary_name, in_file, *args, **kwargs):
+    def cmd_import_m49(self, in_file, *args, **kwargs):
         """
         Convert xlsx file with m49 data into vocabulary
 
@@ -81,12 +81,12 @@ class VocabularyCommands(CkanCommand):
         wb = load_workbook(in_file)
         sheet = wb.active
 
-        level1_cells = (5,6,)
+        level1_cells = (8,9,)
         level1_parent_cell = None
-        level2_cells = (8,9,)
-        level2_parent_cell = 5
+        level2_cells = (10,11,)
+        level2_parent_cell = 8
         countries_cells = (1,3,2)
-        countries_parent_cell = 8
+        countries_parent_cell = 10
 
         countries = []
         level1 = []
@@ -129,7 +129,10 @@ class VocabularyCommands(CkanCommand):
         csvdata.seek(0)
         voc_name = Vocabulary.VOCABULARY_M49_REGIONS
 
-        voc = Vocabulary.create(voc_name, has_relations=True)
+        try:
+            voc = Vocabulary.get(voc_name)
+        except ValueError:
+            voc = Vocabulary.create(voc_name, has_relations=True)
 
         count = load_vocabulary(voc_name, csvdata)
         print(_('loaded {} terms from {} to {} vocabulary').format(count, in_file, voc_name))
