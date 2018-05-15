@@ -11,6 +11,12 @@ def get_fao_datatype(name):
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_DATATYPE, name)
     return term.get_label(lang).label or term.name
 
+def get_fao_m49_region(name):
+    lang = get_lang()
+    term = VocabularyTerm.get(Vocabulary.VOCABULARY_M49_REGIONS, name)
+    return term.get_label(lang).label or term.get_label('en').label
+    
+
 def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 

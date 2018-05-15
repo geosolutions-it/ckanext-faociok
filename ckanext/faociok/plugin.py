@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import json
 import ckan.plugins as plugins
+from ckan.lib.i18n import get_lang
 import ckan.plugins.toolkit as t
 from ckanext.faociok import schema as s
 from ckanext.faociok import helpers as h
@@ -81,12 +82,16 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_faociok_vocabulary_items': h.get_vocabulary_items,
             'get_faociok_package_schema': s._get_package_schema,
             'get_fao_datatype': h.get_fao_datatype,
+            'get_fao_m49_region': h.get_fao_m49_region,
             'load_json': h.load_json,
+
         }
 
     # IFacets
     def dataset_facets(self, facets_dict, package_type):
         facets_dict['fao_datatype'] = t._("Data type")
+        lang = get_lang()
+        facets_dict['fao_m49_regions_{}'.format(lang)] = t._("M49 Region")
         return facets_dict
 
     def get_localized_regions(self, regions):
