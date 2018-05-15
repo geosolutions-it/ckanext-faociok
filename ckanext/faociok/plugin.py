@@ -98,12 +98,15 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         out = {'fao_m49_regions': regions}
         for reg in regions:
             v = VocabularyTerm.get(Vocabulary.VOCABULARY_M49_REGIONS, reg)
-            for label in v.labels:
-                lname = 'fao_m49_regions_{}'.format(label.lang)
-                try:
-                    out[lname].append(label.label)
-                except KeyError:
-                    out[lname] = [label.label]
+            parent = v
+            while parent:
+                for label in parent.labels:
+                    lname = 'fao_m49_regions_{}'.format(label.lang)
+                    try:
+                        out[lname].add(label.label)
+                    except KeyError:
+                        out[lname] = set([label.label])
+                parent = parent.parent
         return out
 
     def before_index(self, pkg_dict):
