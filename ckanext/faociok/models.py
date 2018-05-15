@@ -83,7 +83,7 @@ class VocabularyTerm(DeclarativeBase):
     parent_id = Column(types.Integer, ForeignKey('faociok_vocabulary_term.id'), nullable=True)
     name = Column(types.Unicode, nullable=False, unique=True)
     depth = Column(types.Integer, nullable=False, default=0)
-    path = Column(types.Unicode, nullable=False, default='')
+    path = Column(types.Unicode, nullable=False, default=u'')
     # keep per-term custom properties
     _properties = Column(types.Unicode, nullable=True)
 
@@ -98,7 +98,6 @@ class VocabularyTerm(DeclarativeBase):
     @properties.setter
     def properties(self, value):
         self._properties = json.dumps(value)
-
 
     def set_labels(self, labels):
         for k, v in labels.items():

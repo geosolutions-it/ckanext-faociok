@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 from ckan.common import _, ungettext
 from ckan.plugins.toolkit import Invalid
 from ckanext.faociok.models import Vocabulary
@@ -15,7 +16,6 @@ def fao_datatype(value, context):
     
     return value
 
-
 def fao_m49_regions(value, context):
     if not isinstance(value, list):
         try:
@@ -29,7 +29,6 @@ def fao_m49_regions(value, context):
             if not v.valid_term(term):
                 raise ValueError(_("Term not valid: {}").format(term))
             validated.append(term)
-
     except Exception, err:
         raise Invalid(_("Invalid m49 regions: {} {}").format(value, err))
     return json.dumps(validated)

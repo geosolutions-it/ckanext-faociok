@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 from ckan.lib.i18n import get_lang
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
@@ -16,3 +17,6 @@ def format_term(term, depth):
 def get_vocabulary_items(vocabulary_name):
     return [{'value': i[0], 'text': format_term(i[1], i[2])} for i in VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())]
     
+def load_json(value):
+    val = json.loads(value)
+    return val

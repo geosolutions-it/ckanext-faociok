@@ -119,13 +119,13 @@ class VocabularyCommands(CkanCommand):
 
         csvdata = StringIO()
         w = csv.writer(csvdata)
-        w.writerow(['parent', 'name', 'lang:en', 'property:country_code', 'lang:it', 'lang:de', 'lang:fr'])
+        w.writerow(['parent', 'name', 'lang:en', 'property:country_code', 'lang:it', 'lang:de', 'lang:fr', 'lang:es'])
         for r in level1:
-            w.writerow(r + ([r[2]]*3))
+            w.writerow(r + ([r[2]]*4))
         for r in level2:
-            w.writerow(r + ([r[2]]*3))
+            w.writerow(r + ([r[2]]*4))
         for r in countries:
-            w.writerow(r + ([r[2]]*3))
+            w.writerow(r + ([r[2]]*4))
         csvdata.seek(0)
         voc_name = Vocabulary.VOCABULARY_M49_REGIONS
 

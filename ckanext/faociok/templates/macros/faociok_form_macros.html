@@ -26,7 +26,13 @@
   {% call input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
       <select class="select" placeholder="{{ placeholder }}" name="{{ name }}" {{ attributes(attrs) }} {% if multiple %}multiple{% endif %} {% if use_autocomplete %}data-module="autocomplete"{% endif %} {% if additional_module %}data-module="{{ additional_module }}"{% endif %}>
       {% for option in options %}
-        <option value="{{ option.value }}"{% if option.value == selected %} selected{% endif %}>{{ option.depth_str|safe }}{{ option.text or option.value }}</option>
+        {% if multiple %}
+            {% set is_selected = option.value in selected %}
+        {% else %}
+            {% set is_selected = option.value == selected %}
+        {% endif %}
+
+        <option value="{{ option.value }}"{% if is_selected %} selected{% endif %}>{{ option.depth_str|safe }}{{ option.text or option.value }}</option>
       {% endfor %}
     </select>
     

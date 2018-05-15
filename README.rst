@@ -42,6 +42,12 @@ To install ckanext-faociok:
 
      sudo service apache2 reload
 
+5. Update SOLR schema.xml and add field:
+
+.. code::
+
+   <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
+
 
 ---------------
 Config Settings
