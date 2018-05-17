@@ -11,13 +11,12 @@ import ckan.plugins.toolkit as toolkit
 from pylons import config
 from ckan.lib.cli import CkanCommand
 
-from ckanext.faociok.models import Vocabulary, VocabularyTerm, setup_models, Session, load_vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary
 
 log = logging.getLogger(__name__)
 
 class VocabularyCommands(CkanCommand):
-    """
-    Manage vocabularies in FAO-CIOK extension
+    """Manage vocabularies in FAO-CIOK extension.
     """
 
     summary = __doc__.split('\n')[0]
@@ -37,11 +36,12 @@ class VocabularyCommands(CkanCommand):
         """
         List vocabularies
         """
-        print(_('vocabularies:'))
+        print(_('Vocabularies:'))
         for voc in Vocabulary.get_all():
             print(_('vocabulary name: {}').format(voc.name))
             print(_('  has relations: {}').format(voc.has_relations))
             print()
+        print(_('[end of vocabularies list]'))
 
     def cmd_create(self, vocabulary_name, has_relations=False, *args, **kwargs):
         """
@@ -52,13 +52,6 @@ class VocabularyCommands(CkanCommand):
         """
         Vocabulary.create(vocabulary_name, bool(has_relations))
          
-
-    def cmd_initdb(self, *args, **kwargs):
-        """
-        Init models
-        """
-        setup_models() 
-
     def cmd_load(self, vocabulary_name, path, *args, **kwargs):
         """
         Load vocabulary data

@@ -112,8 +112,9 @@ class VocabularyTerm(DeclarativeBase):
                                      .filter(Vocabulary.name==vocab, cls.name==name).first()
 
         if not item:
-            raise ValueError(_("No term {} for vocabulary {}").format(name, vocab))
-        return item
+            log.info(_("No term {} for vocabulary {}").format(name, vocab))
+
+        return None
 
     @classmethod
     def create(cls, vocab, name, labels=None, parent=None):
