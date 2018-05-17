@@ -6,6 +6,7 @@ from ckan.lib.i18n import get_lang
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 
+
 def get_fao_datatype(name):
     lang = get_lang()
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_DATATYPE, name)
@@ -20,9 +21,12 @@ def get_fao_m49_region(name):
 def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 
-def get_vocabulary_items(vocabulary_name):
-    return [{'value': i[0], 'text': format_term(i[1], i[2])} for i in VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())]
+def get_vocabulary_items(vocabulary_name, in_list=False):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), in_list=in_list)
     
 def load_json(value):
     val = json.loads(value)
     return val
+
+def get_vocabulary_items_annotated(vocabulary_name, in_list=False):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True, in_list=in_list)

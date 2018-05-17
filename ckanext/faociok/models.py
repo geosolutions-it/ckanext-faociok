@@ -6,8 +6,9 @@ import json
 import csv
 
 from ckan.common import _, ungettext
+from ckan.model import Package, PackageExtra, Session
 from sqlalchemy import types, Column, ForeignKey, Index, Table
-from sqlalchemy import orm, and_, or_, desc
+from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal
 from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
@@ -155,19 +156,65 @@ class VocabularyTerm(DeclarativeBase):
         return inst
 
     @classmethod
-    def get_terms_q(cls, vocabulary_name, lang):
+    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, in_list=False):
         s = Session
-        q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
-                                                    .outerjoin(VocabularyLabel)\
-                                                    .filter(Vocabulary.name==vocabulary_name,
-                                                            VocabularyLabel.lang==lang)\
-                                                    .order_by(cls.path)
+        if not include_dataset_count:
+            q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
+                                                        .outerjoin(VocabularyLabel)\
+                                                        .filter(Vocabulary.name==vocabulary_name,
+                                                                VocabularyLabel.lang==lang)\
+                                                        .order_by(cls.path)
+        else:
+
+            #value_cond = PackageExtra.value == cls.name
+            if not in_list:
+                value_cond = PackageExtra.value == cls.name
+            else:
+                value_cond = PackageExtra.value.contains(cls.name)
+
+            q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id, func.count(distinct(Package.id)).label('cnt')).join(Vocabulary)\
+                                                        .outerjoin(VocabularyLabel)\
+                                                        .outerjoin(PackageExtra,
+                                                              and_(PackageExtra.key=='fao_{}'.format(vocabulary_name),
+                                                                   value_cond))\
+                                                        .outerjoin(Package, 
+                                                                and_(Package.id==PackageExtra.package_id,
+                                                                     Package.type=='dataset',
+                                                                     Package.state=='active'))\
+                                                        .filter(Vocabulary.name==vocabulary_name,
+                                                                VocabularyLabel.lang==lang)\
+                                                        .group_by(cls.name, VocabularyLabel.label, cls.depth, cls.id)\
+                                                        .order_by(desc('cnt'))
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang):
-        q = cls.get_terms_q(vocabulary_name, lang)
-        return [(item[0], item[1] or item[0], item[2], item[3],) for item in q]
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, in_list=False):
+        """
+        Returns list of terms for vocabulary
+        @param vocabulary_name name of vocabulary
+        @param lang 2-char lang code
+        @param include_dataset_count returns number of active datasets using this term (default: no)
+        @param in_list flag if use IN operator 
+
+        @rtype list of items:
+                * term name
+                * localized label or term name (if label is not available)
+                * depth
+                * term id
+                (optionally, if include_dataset_count flag is set):
+                * dataset_count
+        """
+        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count, in_list=in_list)
+        keys = ('value', 'text', 'depht', 'id',)
+        if include_dataset_count:
+            keys += ('dataset_count',)
+
+        def make_row(row):
+            out = dict(zip(keys, row))
+            out['text'] = row[1] or row[0]
+            return out
+
+        return [make_row(row) for row in q]
 
 
 class VocabularyLabel(DeclarativeBase):
