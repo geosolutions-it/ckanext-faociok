@@ -4,6 +4,9 @@ from __future__ import print_function
 
 import logging
 import traceback
+import csv
+from cStringIO import StringIO
+from openpyxl import load_workbook
 
 from ckan.common import _, ungettext
 import ckan.plugins.toolkit as toolkit
@@ -61,6 +64,72 @@ class VocabularyCommands(CkanCommand):
         with open(path, 'rt') as f:
             count = load_vocabulary(vocabulary_name, f)
             print(_('loaded {} terms from {} to {} vocabulary').format(count, path, vocabulary_name))
+
+    def cmd_import_m49(self, in_file, *args, **kwargs):
+        """
+        Convert xlsx file with m49 data into vocabulary
+
+        syntax: import_m49 in_file
+        """
+        wb = load_workbook(in_file)
+        sheet = wb.active
+
+        level1_cells = (8,9,)
+        level1_parent_cell = None
+        level2_cells = (10,11,)
+        level2_parent_cell = 8
+        countries_cells = (1,3,2)
+        countries_parent_cell = 10
+
+        countries = []
+        level1 = []
+        level2 = []
+        
+        # 
+        combine_data = ((countries_cells, countries_parent_cell, countries,),
+                        (level1_cells, level1_parent_cell, level1,),
+                        (level2_cells, level2_parent_cell, level2,))
+
+
+        
+        for row in sheet.iter_rows(min_row=6):
+            for indexes, parent_cell, container in combine_data:
+                # ( parent, data..)
+                rdata = []
+                if parent_cell is not None:
+                    rdata.append(row[parent_cell-1].value)
+                else:
+                    rdata.append(parent_cell)
+
+                for idx in indexes:
+                    value = row[idx-1].value
+                    if isinstance(value, unicode):
+                        value = value.encode('utf-8')
+                    rdata.append(value)
+                if not any(rdata):
+                    continue
+                container.append(rdata)
+
+        csvdata = StringIO()
+        w = csv.writer(csvdata)
+        w.writerow(['parent', 'name', 'lang:en', 'property:country_code', 'lang:it', 'lang:de', 'lang:fr', 'lang:es'])
+        for r in level1:
+            w.writerow(r + ([r[2]]*4))
+        for r in level2:
+            w.writerow(r + ([r[2]]*4))
+        for r in countries:
+            w.writerow(r + ([r[2]]*4))
+        csvdata.seek(0)
+        voc_name = Vocabulary.VOCABULARY_M49_REGIONS
+
+        try:
+            voc = Vocabulary.get(voc_name)
+        except ValueError:
+            voc = Vocabulary.create(voc_name, has_relations=True)
+
+        count = load_vocabulary(voc_name, csvdata)
+        print(_('loaded {} terms from {} to {} vocabulary').format(count, in_file, voc_name))
+
 
     def get_commands(self):
         """

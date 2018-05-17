@@ -14,6 +14,16 @@
                 {{ h.get_fao_datatype(pkg_dict[field.name]) }}
             </td>
           </tr>
+        {% elif field.name == 'fao_m49_regions' %}
+            {% for region in h.load_json(pkg_dict[field.name]) %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("Region")}}</th>
+                <td class="dataset-details">
+                    {{ h.get_fao_m49_region(region) }} [id: {{ region }}]
+                </td>
+              </tr>
+            {% endfor %}
+        
         {% endif %}
       {% endfor %}
 

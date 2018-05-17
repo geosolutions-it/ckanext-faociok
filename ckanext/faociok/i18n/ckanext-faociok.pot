@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-faociok 0.0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-05-11 16:44+0200\n"
+"POT-Creation-Date: 2018-05-15 19:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,64 +18,97 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: ckanext/faociok/models.py:54
+#: ckanext/faociok/models.py:55
 msgid "Vocabulary {} doesn't exist"
 msgstr ""
 
-#: ckanext/faociok/models.py:115
+#: ckanext/faociok/models.py:136
 msgid "No term {} for vocabulary {}"
 msgstr ""
 
-#: ckanext/faociok/models.py:224
+#: ckanext/faociok/models.py:249
 msgid "Cannot use 'parent' colum if vocabulary that doesn't support relations"
 msgstr ""
 
-#: ckanext/faociok/plugin.py:72 ckanext/faociok/schema.py:16
+#: ckanext/faociok/plugin.py:92 ckanext/faociok/schema.py:16
 msgid "Data type"
+msgstr ""
+
+#: ckanext/faociok/plugin.py:94
+msgid "M49 Level 1 Region"
+msgstr ""
+
+#: ckanext/faociok/plugin.py:95
+msgid "M49 Level 2 Region"
+msgstr ""
+
+#: ckanext/faociok/plugin.py:96
+msgid "M49 Country Level"
 msgstr ""
 
 #: ckanext/faociok/schema.py:18
 msgid "Select data type of dataset"
 msgstr ""
 
-#: ckanext/faociok/validators.py:12
+#: ckanext/faociok/schema.py:31
+msgid "M49 Regions"
+msgstr ""
+
+#: ckanext/faociok/schema.py:34
+msgid "Regions according to UN M.49 Standard"
+msgstr ""
+
+#: ckanext/faociok/validators.py:13
 msgid "Term not valid"
 msgstr ""
 
-#: ckanext/faociok/validators.py:14
+#: ckanext/faociok/validators.py:15
 msgid "Invalid datatype value: {}: {}"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:40
-msgid "vocabularies:"
+#: ckanext/faociok/validators.py:24
+msgid "Invalid m49 regions value: {} {}"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:42
-msgid "vocabulary name: {}"
+#: ckanext/faociok/validators.py:30
+msgid "Term not valid: {}"
+msgstr ""
+
+#: ckanext/faociok/validators.py:33
+msgid "Invalid m49 regions: {} {}"
 msgstr ""
 
 #: ckanext/faociok/commands/vocabulary.py:43
+msgid "vocabularies:"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:45
+msgid "vocabulary name: {}"
+msgstr ""
+
+#: ckanext/faociok/commands/vocabulary.py:46
 msgid "  has relations: {}"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:70
+#: ckanext/faociok/commands/vocabulary.py:73
+#: ckanext/faociok/commands/vocabulary.py:138
 msgid "loaded {} terms from {} to {} vocabulary"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:88
+#: ckanext/faociok/commands/vocabulary.py:157
 msgid "ERROR: missing command"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:96
+#: ckanext/faociok/commands/vocabulary.py:165
 msgid "ERROR: invalid command: {}"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:105
+#: ckanext/faociok/commands/vocabulary.py:174
 #, python-format
 msgid "Can't execute %s with args %s: %s"
 msgstr ""
 
-#: ckanext/faociok/commands/vocabulary.py:107
+#: ckanext/faociok/commands/vocabulary.py:176
 msgid "Can't execute {} with args {}: {}"
 msgstr ""
 
@@ -89,5 +122,9 @@ msgstr ""
 
 #: ckanext/faociok/templates/package/snippets/faociok_additional_info.html:2
 msgid "Dataset Metadata"
+msgstr ""
+
+#: ckanext/faociok/templates/package/snippets/faociok_additional_info.html:20
+msgid "Region"
 msgstr ""
 

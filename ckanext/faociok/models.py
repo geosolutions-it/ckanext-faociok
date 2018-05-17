@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
+import json
 import csv
 
 from ckan.common import _, ungettext
 from sqlalchemy import types, Column, ForeignKey, Index, Table
-from sqlalchemy import orm, and_, or_
+from sqlalchemy import orm, and_, or_, desc
 from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
@@ -24,17 +24,18 @@ DeclarativeBase = declarative_base(metadata=meta.metadata)
 
 class Vocabulary(DeclarativeBase):
     VOCABULARY_DATATYPE = 'datatype'
+    VOCABULARY_M49_REGIONS = 'm49_regions'
 
     __tablename__ = 'faociok_vocabulary'
     id = Column(types.Integer, primary_key=True)
     name = Column(types.Unicode, unique=True)
     has_relations = Column(types.Boolean, default=False)
     
-    terms = orm.relationship('VocabularyTerm')
+    terms = orm.relationship('VocabularyTerm', back_populates='vocabulary')
 
-    def __init__(self, name, has_relations=False):
-        self.name = name
-        self.has_relations = has_relations
+    def __str__(self):
+        return 'Vocabulary({}{})'.format(self.name, 
+                                          ' with relations' if self.has_relations else '')
 
     def valid_term(self, term):
         q = Session.query(VocabularyTerm).filter(VocabularyTerm.name==term)
@@ -42,7 +43,7 @@ class Vocabulary(DeclarativeBase):
 
     @classmethod
     def create(cls, name, has_relations=False):
-        inst = cls(name=name, has_relations=False)
+        inst = cls(name=name, has_relations=has_relations)
         Session.add(inst)
         Session.flush()
         return inst
@@ -81,19 +82,22 @@ class VocabularyTerm(DeclarativeBase):
     vocabulary_id = Column(types.Integer, ForeignKey(Vocabulary.id), nullable=False)
     parent_id = Column(types.Integer, ForeignKey('faociok_vocabulary_term.id'), nullable=True)
     name = Column(types.Unicode, nullable=False, unique=True)
+    depth = Column(types.Integer, nullable=False, default=0)
+    path = Column(types.Unicode, nullable=False, default=u'')
+    # keep per-term custom properties
+    _properties = Column(types.Unicode, nullable=True)
 
-    parent = orm.relationship('VocabularyTerm')
-    children = orm.relationship('VocabularyTerm')
-    labels = orm.relationship('VocabularyLabel')
+    vocabulary = orm.relationship('Vocabulary', uselist=False, back_populates='terms')
+    labels = orm.relationship('VocabularyLabel', back_populates='term')
+    parent = orm.relationship('VocabularyTerm', lazy=True, uselist=False, remote_side=[id])
 
-    def __init__(self, vocabulary, name, parent=None):
-        if isinstance(vocabulary, Vocabulary):
-            self.vocabulary_id = vocabulary.id
-        else:
-            self.vocabulary_id = vocabulary
-        self.name = name
-        if parent:
-            self.parent = parent
+    @property
+    def properties(self):
+        return json.loads(self._properties or '{}')
+
+    @properties.setter
+    def properties(self, value):
+        self._properties = json.dumps(value)
 
     def set_labels(self, labels):
         for k, v in labels.items():
@@ -102,11 +106,28 @@ class VocabularyTerm(DeclarativeBase):
     def get_label(self, lang):
         return Session.query(VocabularyLabel).filter(VocabularyLabel.term_id==self.id,
                                                      VocabularyLabel.lang==lang).first()
-    
+    def get_path(self):
+        parent = self
+        old_parent = None
+        out = []
+
+        while parent and parent != old_parent:
+            out.append(parent.name)
+            old_parent = parent
+            parent = parent.parent
+        return '/'.join(reversed(out))
+
+    def update_path(self):
+        path = self.get_path()
+        self.path = path
+
     @classmethod
     def get(cls, vocab, name):
         if isinstance(vocab, Vocabulary):
-            item = Session.query(cls).filter(vocabulary_id==vocab.id, cls.name==name).first()
+            item = Session.query(cls).filter(cls.vocabulary_id==vocab.id,
+                                             cls.name==name)\
+                                     .first()
+
         else:
             item = Session.query(cls).join(Vocabulary)\
                                      .filter(Vocabulary.name==vocab, cls.name==name).first()
@@ -117,10 +138,17 @@ class VocabularyTerm(DeclarativeBase):
         return None
 
     @classmethod
-    def create(cls, vocab, name, labels=None, parent=None):
+    def create(cls, vocab, name, labels=None, parent=None, properties=None):
         if not isinstance(vocab, Vocabulary):
             vocab = Vocabulary.get(vocab)
-        inst = cls(vocab, name, parent)
+        
+        inst = cls(vocabulary=vocab,
+                   name=name,
+                   depth=parent.depth +1 if parent else 0,
+                   parent=parent)
+        inst.properties = properties or {}
+
+        inst.update_path()
         Session.add(inst)
         Session.flush()
         if labels:
@@ -130,16 +158,17 @@ class VocabularyTerm(DeclarativeBase):
     @classmethod
     def get_terms_q(cls, vocabulary_name, lang):
         s = Session
-        q = s.query(cls.name, VocabularyLabel.label).join(Vocabulary)\
+        q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
                                                     .outerjoin(VocabularyLabel)\
                                                     .filter(Vocabulary.name==vocabulary_name,
-                                                            VocabularyLabel.lang==lang)
+                                                            VocabularyLabel.lang==lang)\
+                                                    .order_by(cls.path)
         return q
     
     @classmethod
     def get_terms(cls, vocabulary_name, lang):
         q = cls.get_terms_q(vocabulary_name, lang)
-        return [(item[0], item[1] or item[0],) for item in q]
+        return [(item[0], item[1] or item[0], item[2], item[3],) for item in q]
 
 
 class VocabularyLabel(DeclarativeBase):
@@ -148,16 +177,13 @@ class VocabularyLabel(DeclarativeBase):
     term_id = Column(types.Integer, ForeignKey(VocabularyTerm.id))
     label = Column(types.Unicode, nullable=False)
     lang = Column(types.Unicode, nullable=False)
-    term = orm.relationship(VocabularyTerm)
-
-    def __init__(self, term, label, lang):
-        self.term = term
-        self.label = label
-        self.lang = lang
+    term = orm.relationship(VocabularyTerm, uselist=False, back_populates='labels')
 
     @classmethod
     def create(cls, term, label, lang):
-        inst = cls(term, label, lang)
+        inst = cls(term=term,
+                   label=label,
+                   lang=lang)
         Session.add(inst)
         Session.flush()
         return inst
@@ -169,7 +195,6 @@ def setup_models():
               VocabularyLabel.__table__):
         if not t.exists():
             t.create()
-
 
 def load_vocabulary(vocabulary_name, fh, **vocab_config):
     """
@@ -216,7 +241,7 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
     row_offset = 1
     # get headers with lang names
     headers = header[row_offset:]
-    parent_name = None
+    parent_idx = None
     default = 0
 
     # establish if we have a parent
@@ -228,18 +253,29 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         row_offset = 2
         default = 1
         headers = header[row_offset:]
-        parent_name = header[0]
+        parent_idx = 0
     
     for row in r:
-        # per-term labels with header
-        labels = dict(zip(headers, row[row_offset:]))
+        # all data for row
+        _data = dict(zip(headers, row[row_offset:]))
+        # properties are cells for which header starts with 'property:' prefix
+        properties = dict( (k[len('property:'):],v,) for k,v in _data.items() if k.startswith('property:'))
+        # labels are cells for which header starts with 'lang:'
+        labels = dict( (k[len('lang:'):],v,) for k,v in _data.items() if k.startswith('lang:'))
+
         if not labels:
             continue
-
         parent = None
         default_label = row[default]
-        if parent_name:
-            parent = VocabularyTerm.get(vocab, parent_name)
-        VocabularyTerm.create(vocab, default_label, labels, parent=parent)
+        try:
+            existing = VocabularyTerm.get(vocab, default_label)
+            continue
+        except ValueError:
+            pass
+        if parent_idx is not None:
+            parent_name = row[parent_idx] 
+            if parent_name:
+                parent = VocabularyTerm.get(vocab, parent_name)
+        VocabularyTerm.create(vocab, default_label, labels, parent=parent, properties=properties)
         counter += 1
     return counter
