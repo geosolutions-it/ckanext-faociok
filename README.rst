@@ -26,19 +26,23 @@ Installation
 
 To install ckanext-faociok:
 
-1. Activate your CKAN virtual environment, for example::
+#. Activate your CKAN virtual environment, for example::
 
      . /usr/lib/ckan/default/bin/activate
 
-2. Install the ckanext-faociok Python package into your virtual environment::
+#. Install the ckanext-faociok Python package into your virtual environment::
 
      pip install ckanext-faociok
 
-3. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
+#. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
+   
+#. Update the DB using the ``initdb`` command::
+  
+     paster --plugin=ckanext-faociok vocabulary initdb --config=/etc/ckan/default/production.ini
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+#. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
 
