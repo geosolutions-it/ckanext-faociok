@@ -70,6 +70,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     # IValidators
 
     def get_validators(self):
+        # remember, due to schema<->vocabulary dependency,
+        # schema field should be constructed `fao_` + vocab name
         return {
             'fao_datatype': v.fao_datatype,
             'fao_m49_regions': v.fao_m49_regions,
@@ -80,6 +82,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     def get_helpers(self):
         return {
             'get_faociok_vocabulary_items': h.get_vocabulary_items,
+            #'get_faociok_vocabulary_items_raw': h.get_vocabulary_items_raw,
+            'get_faociok_vocabulary_items_annotated': h.get_vocabulary_items_annotated,
             'get_faociok_package_schema': s._get_package_schema,
             'get_fao_datatype': h.get_fao_datatype,
             'get_fao_m49_region': h.get_fao_m49_region,

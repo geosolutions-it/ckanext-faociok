@@ -22,7 +22,7 @@ def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 
 def get_vocabulary_items(vocabulary_name):
-    return [{'value': i[0], 'text': format_term(i[1], i[2])} for i in VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())]
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())
     
 def load_json(value, fail=False):
     try:

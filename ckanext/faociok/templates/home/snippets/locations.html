@@ -1,0 +1,30 @@
+{% set regions = h.get_faociok_vocabulary_items_annotated('m49_regions')[:4] %}
+
+<div class="module box container module-narrow module-shallow">
+    <div class="module-content">
+    <h3 class="heading">{{ _('Locations') }}</h3>
+
+    <div class="row">
+      {% for dtype in regions %}
+        {% if loop.index0 > 0 %}
+            {% if loop.index0%4==0 %}<div class="clearfix visible-lg"></div>{% endif %}
+            {% if loop.index0%3==0 %}<div class="clearfix visible-md clearfix-ie7"></div>{% endif %}
+            {% if loop.index0%2==0 %}<div class="clearfix visible-sm"></div>{% endif %}
+        {% endif %}
+        <div class="col-lg-3 col-md-4 col-sm-6 padding-fix">
+            {% set datatype_url=h.url_for('search', fao_m49_regions=dtype.value) %}
+          <div class="fao-item-summary fao-item-m49-regions">
+            <a href="{{ datatype_url }}" class="fao-item-header">
+              <div class="fao-item-title">{{ dtype.text }}</div>
+            </a>
+            <div class="fao-item-body">
+              <div class="fao-item-count">{% trans dataset_count=dtype.dataset_count %}{{ dataset_count }} Dataset{% pluralize dataset_count %}{{ dataset_count }} Datasets{% endtrans %}</div>
+              <div class="clearfix clearfix-ie7"> &nbsp;</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    </div>
+</div>
+
