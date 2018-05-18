@@ -23,7 +23,7 @@ def _get_package_schema():
          'is_required': True,
          },
          {'name': 'fao_m49_regions',
-          'validators': [t.get_validator('fao_m49_regions')],
+          'validators': [t.get_validator('ignore_missing'), t.get_validator('fao_m49_regions')],
           'element': 'select',
           'multiple': True,
           'type': 'json',
