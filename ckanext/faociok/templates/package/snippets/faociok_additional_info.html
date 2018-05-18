@@ -15,7 +15,7 @@
             </td>
           </tr>
         {% elif field.name == 'fao_m49_regions' %}
-            {% for region in h.load_json(pkg_dict[field.name]) %}
+            {% for region in h.load_json(pkg_dict[field.name] or "{}") %}
               <tr>
                 <th scope="row" class="dataset-label">{{ _("Region")}}</th>
                 <td class="dataset-details">

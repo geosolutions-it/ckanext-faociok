@@ -4,12 +4,12 @@
             {% if field.element == 'select' %}
             
                   {% set options = h.get_faociok_vocabulary_items(field.vocabulary_name) or field.options %}
+                  
                   {% if field.type == 'json' %}
-                    {% set selected = h.load_json(data[field.name]) %}
+                    {% set selected = h.load_json(data[field.name] or "{}") %}
                   {% else %}
                     {% set selected = data[field.name] %}
                   {% endif %}
-
                   {{ dform.select(field.name,
                                   label=field.label,
                                   options=options,

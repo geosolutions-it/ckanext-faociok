@@ -27,7 +27,7 @@
       <select class="select" placeholder="{{ placeholder }}" name="{{ name }}" {{ attributes(attrs) }} {% if multiple %}multiple{% endif %} {% if use_autocomplete %}data-module="autocomplete"{% endif %} {% if additional_module %}data-module="{{ additional_module }}"{% endif %}>
       {% for option in options %}
         {% if multiple %}
-            {% set is_selected = option.value in selected %}
+            {% set is_selected = option.value in selected if selected is sequence else option.value == selected %}
         {% else %}
             {% set is_selected = option.value == selected %}
         {% endif %}

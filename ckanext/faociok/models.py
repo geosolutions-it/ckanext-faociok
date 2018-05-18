@@ -126,15 +126,15 @@ class VocabularyTerm(DeclarativeBase):
     def get(cls, vocab, name):
         if isinstance(vocab, Vocabulary):
             item = Session.query(cls).filter(cls.vocabulary_id==vocab.id,
-                                             cls.name==name)\
-                                     .first()
+                                             cls.name==name).first()
 
         else:
             item = Session.query(cls).join(Vocabulary)\
                                      .filter(Vocabulary.name==vocab, cls.name==name).first()
 
         if not item:
-            raise ValueError(_("No term {} for vocabulary {}").format(name, vocab))
+            log.info(_("No term {} for vocabulary {}").format(name, vocab))
+
         return item
 
     @classmethod
@@ -147,16 +147,16 @@ class VocabularyTerm(DeclarativeBase):
                    depth=parent.depth +1 if parent else 0,
                    parent=parent)
         inst.properties = properties or {}
+        if labels:
+            inst.set_labels(labels)
 
         inst.update_path()
         Session.add(inst)
         Session.flush()
-        if labels:
-            inst.set_labels(labels)
         return inst
 
     @classmethod
-    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, in_list=False):
+    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False):
         s = Session
         if not include_dataset_count:
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
@@ -167,10 +167,7 @@ class VocabularyTerm(DeclarativeBase):
         else:
 
             #value_cond = PackageExtra.value == cls.name
-            if not in_list:
-                value_cond = PackageExtra.value == cls.name
-            else:
-                value_cond = PackageExtra.value.contains(cls.name)
+            value_cond = PackageExtra.value == cls.name
 
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id, func.count(distinct(Package.id)).label('cnt')).join(Vocabulary)\
                                                         .outerjoin(VocabularyLabel)\
@@ -188,13 +185,12 @@ class VocabularyTerm(DeclarativeBase):
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, in_list=False):
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False):
         """
         Returns list of terms for vocabulary
         @param vocabulary_name name of vocabulary
         @param lang 2-char lang code
         @param include_dataset_count returns number of active datasets using this term (default: no)
-        @param in_list flag if use IN operator 
 
         @rtype list of items:
                 * term name
@@ -204,14 +200,17 @@ class VocabularyTerm(DeclarativeBase):
                 (optionally, if include_dataset_count flag is set):
                 * dataset_count
         """
-        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count, in_list=in_list)
-        keys = ('value', 'text', 'depht', 'id',)
+        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count)
+        keys = ('value', 'text', 'depth', 'id',)
         if include_dataset_count:
             keys += ('dataset_count',)
 
         def make_row(row):
             out = dict(zip(keys, row))
             out['text'] = row[1] or row[0]
+            formatted_elements = '-' * out['depth'], ' ' if out['depth'] else '', out['text'],
+            out['text_raw'] = out['text']
+            out['text'] = u'{}{}{}'.format(*formatted_elements)
             return out
 
         return [make_row(row) for row in q]
@@ -248,80 +247,93 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
 
     fh is a file-like object containing csv data in format:
      * first row contains header with values
-       * term, $languagecode,...
-       or 
-       * parent, term, $languagecode..
+       * term (required)
+       * parent (optional)
+       * lang:LANGCODE (optional)
+       * property:PROPNAME (optional)
      * each next row contains values:
        
      For example:
 
-        term,en,it,de,fr
-        microdata,Microdata,,,
-        geospatial-data,Geospatial data,,,
+        parent, term, property:ISO3, lang:en, lang:it, lang:de, lang:fr
+              ,EU   ,              , Europe , Europa,,
+        EU    ,031  , ITA          , Italy  , Italia,,
 
      or:
-
-
-        parent,term,en,it,de,fr
-        ,microdata,Microdata,,,
-        microdata,geospatial-data,Geospatial data,,,
+        term,lang:en,lang:it
+        microdata,Microdata, Microdata
+        geospatial,Geospatial data,Dati Geospaziali
 
     @param vocabulary_name Vocabulary instance or name of vocabulary
     @param file-like object with terms data
 
     @rtype int number of terms loaded
     """
+    
     try:
         vocab = Vocabulary.get(vocabulary_name)
         vocab.clear()
     except ValueError:
         vocab = Vocabulary.create(vocabulary_name, **vocab_config)
     
-    
-    r = csv.reader(fh)
+    print(_("Using Vocabulary{}").format(vocab))
+
+    rows = csv.reader(fh)
     counter = 0
     # first row is a header
-    header = list(r.next())
+    headers = list(rows.next())
 
-    # row offset for data, default 1, as column 0 has term.name
-    row_offset = 1
-    # get headers with lang names
-    headers = header[row_offset:]
     parent_idx = None
-    default = 0
+    term_idx = None
+
+    idx = 0   
+    for header in headers:
+        if header == "parent":
+            print(_("Parent column found at idx {}").format(idx))
+            parent_idx = idx
+        elif header == "term":
+            print(_("Term column found at idx {}").format(idx))
+            term_idx = idx
+        elif not header.startswith('lang:') and not header.startswith('property:'):
+            print(_("Column {} will not be stored").format(header))
+        idx = idx + 1
 
     # establish if we have a parent
-    if header[0] == 'parent':
-        if not vocab.has_relations:
-            raise ValueError(_("Cannot use 'parent' colum if "
-                               "vocabulary that doesn't "
-                               "support relations"))
-        row_offset = 2
-        default = 1
-        headers = header[row_offset:]
-        parent_idx = 0
+    if parent_idx is not None and not vocab.has_relations:
+        raise ValueError(_("Cannot use 'parent' colum if "
+                           "vocabulary that doesn't support relations"))
+
+    if term_idx is None:
+        raise ValueError(_("Term column not found"))
     
-    for row in r:
+    for row in rows:
         # all data for row
-        _data = dict(zip(headers, row[row_offset:]))
+        _data = dict(zip(headers, row))
         # properties are cells for which header starts with 'property:' prefix
-        properties = dict( (k[len('property:'):],v,) for k,v in _data.items() if k.startswith('property:'))
+        properties = dict( (k[len('property:'):],v,) for k,v in _data.items() if k.startswith('property:') and v)
         # labels are cells for which header starts with 'lang:'
         labels = dict( (k[len('lang:'):],v,) for k,v in _data.items() if k.startswith('lang:'))
 
-        if not labels:
+        term = row[term_idx]
+        parent = row[parent_idx] if parent_idx is not None else None
+
+        if not term:
+            print(_("Skipping row with no term: {}").format(_data))
             continue
-        parent = None
-        default_label = row[default]
-        try:
-            existing = VocabularyTerm.get(vocab, default_label)
+
+        term_from_db = VocabularyTerm.get(vocab, term)
+        # print(_("TERM FROM DB ID[{}] DB[{}] ").format(term, term_from_db))
+        if term_from_db:
+            print(_("Skipping existing term: INPUT [{}] DB [{}] ").format(_data, term_from_db))
             continue
-        except ValueError:
-            pass
-        if parent_idx is not None:
-            parent_name = row[parent_idx] 
-            if parent_name:
-                parent = VocabularyTerm.get(vocab, parent_name)
-        VocabularyTerm.create(vocab, default_label, labels, parent=parent, properties=properties)
+
+        parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
+        # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
+        
+        VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
+        if not VocabularyTerm.get(vocab, term):
+            print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))
+        
+        
         counter += 1
     return counter

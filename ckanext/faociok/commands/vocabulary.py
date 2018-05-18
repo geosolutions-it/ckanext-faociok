@@ -14,13 +14,12 @@ import ckan.plugins.toolkit as toolkit
 from pylons import config
 from ckan.lib.cli import CkanCommand
 
-from ckanext.faociok.models import Vocabulary, VocabularyTerm, setup_models, Session, load_vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary
 
 log = logging.getLogger(__name__)
 
 class VocabularyCommands(CkanCommand):
-    """
-    Manage vocabularies in FAO-CIOK extension
+    """Manage vocabularies in FAO-CIOK extension.
     """
 
     summary = __doc__.split('\n')[0]
@@ -40,11 +39,12 @@ class VocabularyCommands(CkanCommand):
         """
         List vocabularies
         """
-        print(_('vocabularies:'))
+        print(_('Vocabularies:'))
         for voc in Vocabulary.get_all():
             print(_('vocabulary name: {}').format(voc.name))
             print(_('  has relations: {}').format(voc.has_relations))
             print()
+        print(_('[end of vocabularies list]'))
 
     def cmd_create(self, vocabulary_name, has_relations=False, *args, **kwargs):
         """
@@ -55,13 +55,6 @@ class VocabularyCommands(CkanCommand):
         """
         Vocabulary.create(vocabulary_name, bool(has_relations))
          
-
-    def cmd_initdb(self, *args, **kwargs):
-        """
-        Init models
-        """
-        setup_models() 
-
     def cmd_load(self, vocabulary_name, path, *args, **kwargs):
         """
         Load vocabulary data
@@ -81,51 +74,57 @@ class VocabularyCommands(CkanCommand):
         wb = load_workbook(in_file)
         sheet = wb.active
 
-        level1_cells = (8,9,)
-        level1_parent_cell = None
-        level2_cells = (10,11,)
-        level2_parent_cell = 8
-        countries_cells = (1,3,2)
-        countries_parent_cell = 10
+        IDX_COUNTRY_CODE = 1
+        IDX_ALPHA3_CODE = 2
+        IDX_COUNTRY_NAME = 3
+        IDX_L1_CODE = 8
+        IDX_L1_NAME = 9
+        IDX_L2_CODE = 10
+        IDX_L2_NAME = 11
 
-        countries = []
-        level1 = []
-        level2 = []
+        level1_cells = (IDX_L1_CODE, IDX_L1_NAME,)
+        level2_cells = (IDX_L2_CODE, IDX_L2_NAME,)
+        level2_parent_cell = IDX_L1_CODE
+        countries_cells = (IDX_COUNTRY_CODE,IDX_COUNTRY_NAME, IDX_ALPHA3_CODE)
+        countries_parent_cell = IDX_L2_CODE
+
+        countries = {}  # key: id , value : row
+        level1 = {}     # key: id , value : row
+        level2 = {}     # key: id , value : row
         
         # 
         combine_data = ((countries_cells, countries_parent_cell, countries,),
-                        (level1_cells, level1_parent_cell, level1,),
+                        (level1_cells, None, level1,),
                         (level2_cells, level2_parent_cell, level2,))
-
-
         
         for row in sheet.iter_rows(min_row=6):
-            for indexes, parent_cell, container in combine_data:
+            for indexes, parent_idx, container in combine_data:
                 # ( parent, data..)
                 rdata = []
-                if parent_cell is not None:
-                    rdata.append(row[parent_cell-1].value)
-                else:
-                    rdata.append(parent_cell)
-
+                rdata.append(row[parent_idx-1].value if parent_idx else None)
+                
                 for idx in indexes:
                     value = row[idx-1].value
-                    if isinstance(value, unicode):
-                        value = value.encode('utf-8')
-                    rdata.append(value)
+                    rdata.append(value.encode('utf-8') if isinstance(value, unicode) else value)
+
                 if not any(rdata):
                     continue
-                container.append(rdata)
+
+                id = rdata[1]
+                container[id] = rdata  # l1 and l2 may be repeated
 
         csvdata = StringIO()
         w = csv.writer(csvdata)
-        w.writerow(['parent', 'name', 'lang:en', 'property:country_code', 'lang:it', 'lang:de', 'lang:fr', 'lang:es'])
-        for r in level1:
-            w.writerow(r + ([r[2]]*4))
-        for r in level2:
-            w.writerow(r + ([r[2]]*4))
-        for r in countries:
-            w.writerow(r + ([r[2]]*4))
+        w.writerow(['parent', 'term', 'property:country_code', 'lang:en', 'lang:fr', 'lang:es'])
+        for id,r in level1.iteritems():
+            # print('L1 ROW {}: {}'.format(id,r))
+            w.writerow([r[0]] + [r[1]] + [""] + [r[2]] + [r[2]+" [FR]"] + [r[2]+" [ES]"] )
+        for id,r in level2.iteritems():
+            # print('L2 ROW {}: {}'.format(id,r))
+            w.writerow([r[0]] + [r[1]] + [""] + [r[2]] + [r[2]+" [FR]"] + [r[2]+" [ES]"] )
+        for id,r in countries.iteritems():
+            # print('CNTY ROW {}: {}'.format(id,r))
+            w.writerow([r[0]] + [r[1]] + [r[3]] + [r[2]] + [r[2]+" [FR]"] + [r[2]+" [ES]"] )
         csvdata.seek(0)
         voc_name = Vocabulary.VOCABULARY_M49_REGIONS
 

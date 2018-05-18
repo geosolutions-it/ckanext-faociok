@@ -84,7 +84,7 @@ setup(
 
         [paste.paster_command]
         vocabulary=ckanext.faociok.commands.vocabulary:VocabularyCommands
-
+        faociok=ckanext.faociok.commands.commands:FAOCIOKCommand
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

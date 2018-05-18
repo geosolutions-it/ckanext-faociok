@@ -1,7 +1,6 @@
-name,lang:en,lang:it,lang:de,lang:fr
-microdata,Microdata,,,
-geospatial-data,Geospatial data,,,
-time-series,National time series / aggregated indicators,,,
-corpo-monitoring,Corporate monitoring datasets,,,
-other,"Other (i.e. photos, etc.)",,,
-
+term,lang:en,lang:es,lang:fr
+microdata,Microdata,Microdata ES,Microdata FR
+geospatial,Geospatial data,Geospatial ES, Geospatial FR
+timeseries,National time series / aggregated indicators,Time series ES, Time series FR
+monitoring,Corporate monitoring datasets,monitoring ES, monitoring FR
+other,"Other (i.e. photos, etc.)",other ES, other FR
