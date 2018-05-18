@@ -3,61 +3,64 @@
 ckanext-faociok
 =============
 
-.. Put a description of your extension here:
-   What does it do? What features does it have?
-   Consider including some screenshots or embedding a video!
-
+- GUI customization
+- M49 vocabulary
+- Dataset schema customization and faceting
+  - Datatype
+  - M49 region indexing
+- Scripts for creating default groups
 
 ------------
 Requirements
 ------------
 
-For example, you might want to mention here which versions of CKAN this
-extension works with.
-
+...
 
 ------------
 Installation
 ------------
 
-.. Add any additional install steps to the list below.
-   For example installing any non-Python dependencies or adding any required
-   config settings.
-
 To install ckanext-faociok:
 
-1. Activate your CKAN virtual environment, for example::
+#. Activate your CKAN virtual environment, for example::
 
      . /usr/lib/ckan/default/bin/activate
 
-2. Install the ckanext-faociok Python package into your virtual environment::
+#. Install the ckanext-faociok Python package into your virtual environment::
 
      pip install ckanext-faociok
 
-3. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
+#. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+#. Update the DB using the ``initdb`` command::
+ 
+     paster --plugin=ckanext-faociok faociok initdb --config=/etc/ckan/default/production.ini
+     
+#. Load the M49 vocabulary::
+
+     paster --plugin=ckanext-faociok vocabulary import_m49 files/M49_Codes.xlsx --config=/etc/ckan/default/production.ini
+
+#. Load the datatypes codelist::
+
+     paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
+
+#. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
 
-5. Update SOLR schema.xml and add field:
+   If CKAN is managed through supervisor::
+
+     systemctl restart supervisord 
+
+#. Update SOLR schema.xml and add field:
 
 .. code::
 
    <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
-
-
----------------
-Config Settings
----------------
-
-Document any optional config settings here. For example::
-
-    # The minimum number of hours to wait before re-checking a resource
-    # (optional, default: 24).
-    ckanext.faociok.some_setting = some_default_value
+   
+#. Restart SOLR
 
 
 ------------------------
@@ -86,58 +89,3 @@ coverage installed in your virtualenv (``pip install coverage``) then run::
 
     nosetests --nologcapture --with-pylons=test.ini --with-coverage --cover-package=ckanext.faociok --cover-inclusive --cover-erase --cover-tests
 
-
----------------------------------
-Registering ckanext-faociok on PyPI
----------------------------------
-
-ckanext-faociok should be availabe on PyPI as
-https://pypi.python.org/pypi/ckanext-faociok. If that link doesn't work, then
-you can register the project on PyPI for the first time by following these
-steps:
-
-1. Create a source distribution of the project::
-
-     python setup.py sdist
-
-2. Register the project::
-
-     python setup.py register
-
-3. Upload the source distribution to PyPI::
-
-     python setup.py sdist upload
-
-4. Tag the first release of the project on GitHub with the version number from
-   the ``setup.py`` file. For example if the version number in ``setup.py`` is
-   0.0.1 then do::
-
-       git tag 0.0.1
-       git push --tags
-
-
-----------------------------------------
-Releasing a New Version of ckanext-faociok
-----------------------------------------
-
-ckanext-faociok is availabe on PyPI as https://pypi.python.org/pypi/ckanext-faociok.
-To publish a new version to PyPI follow these steps:
-
-1. Update the version number in the ``setup.py`` file.
-   See `PEP 440 <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
-   for how to choose version numbers.
-
-2. Create a source distribution of the new version::
-
-     python setup.py sdist
-
-3. Upload the source distribution to PyPI::
-
-     python setup.py sdist upload
-
-4. Tag the new release of the project on GitHub with the version number from
-   the ``setup.py`` file. For example if the version number in ``setup.py`` is
-   0.0.2 then do::
-
-       git tag 0.0.2
-       git push --tags
