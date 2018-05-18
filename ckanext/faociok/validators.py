@@ -17,6 +17,8 @@ def fao_datatype(value, context):
     return value
 
 def fao_m49_regions(value, context):
+    if not value:
+        return
     if not isinstance(value, list):
         try:
             value = json.loads(value)
