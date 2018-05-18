@@ -89,8 +89,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
 
     # IFacets
     def dataset_facets(self, facets_dict, package_type):
-        facets_dict['fao_datatype'] = t._("Data type")
         lang = get_lang()
+        facets_dict['fao_datatype_{}'.format(lang)] = t._("Data type")
         for idx, l in enumerate([t._("M49 Level 1 Region"),
                                  t._("M49 Level 2 Region"),
                                  t._("M49 Country Level")]):
@@ -112,9 +112,22 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
                 parent = parent.parent
         return out
 
+    def get_localized_datatype(self, datatype):
+        out = {'fao_datatype': datatype}
+        v = VocabularyTerm.get(Vocabulary.VOCABULARY_DATATYPE, datatype)
+        for l in v.labels:
+            lname = 'fao_datatype_{}'.format(l.lang)
+            out[lname] = l.label
+        return out
+
     def before_index(self, pkg_dict):
-        if pkg_dict.get('fao_m49_regions'):
-            regions = json.loads(pkg_dict['fao_m49_regions'])
+        regions = pkg_dict.get('fao_m49_regions')
+        if regions:
+            if not isinstance(regions, list):
+                regions = json.loads(regions)
             localized_regions = self.get_localized_regions(regions)
             pkg_dict.update(localized_regions)
+        if pkg_dict.get('fao_datatype'):
+            localized_datatype = self.get_localized_datatype(pkg_dict['fao_datatype'])
+            pkg_dict.update(localized_datatype)
         return pkg_dict
