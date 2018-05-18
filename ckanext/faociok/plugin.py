@@ -110,6 +110,9 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
                     except KeyError:
                         out[lname] = list(set([label.label]))
                 parent = parent.parent
+        for k,v in out.items():
+            if isinstance(v, set):
+                out[k] = list(v)
         return out
 
     def get_localized_datatype(self, datatype):
