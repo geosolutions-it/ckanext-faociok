@@ -87,6 +87,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_faociok_package_schema': s._get_package_schema,
             'get_fao_datatype': h.get_fao_datatype,
             'get_fao_m49_region': h.get_fao_m49_region,
+            'get_faociok_field_data': h.get_field_data,
             'load_json': h.load_json,
 
         }
@@ -112,7 +113,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
                     try:
                         out[lname].add(label.label)
                     except KeyError:
-                        out[lname] = list(set([label.label]))
+                        out[lname] = set([label.label])
                 parent = parent.parent
         for k,v in out.items():
             if isinstance(v, set):
@@ -131,7 +132,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         regions = pkg_dict.get('fao_m49_regions')
         if regions:
             if not isinstance(regions, list):
-                regions = json.loads(regions)
+                regions = v._deserialize_from_array(regions)
             localized_regions = self.get_localized_regions(regions)
             pkg_dict.update(localized_regions)
         if pkg_dict.get('fao_datatype'):

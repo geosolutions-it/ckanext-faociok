@@ -3,6 +3,7 @@
 
 import json
 from ckan.lib.i18n import get_lang
+from ckanext.faociok import validators as v
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 
@@ -21,8 +22,8 @@ def get_fao_m49_region(name):
 def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 
-def get_vocabulary_items(vocabulary_name):
-    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())
+def get_vocabulary_items(vocabulary_name, is_multiple=False):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), is_multiple=is_multiple)
     
 def load_json(value, fail=False):
     try:
@@ -32,5 +33,11 @@ def load_json(value, fail=False):
             raise
         return value
 
-def get_vocabulary_items_annotated(vocabulary_name):
-    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True)
+def get_field_data(data, field):
+    if field.get('multiple'):
+        return v._deserialize_from_array(data)
+    else:
+        return data
+
+def get_vocabulary_items_annotated(vocabulary_name, is_multiple=False):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True, is_multiple=is_multiple)
