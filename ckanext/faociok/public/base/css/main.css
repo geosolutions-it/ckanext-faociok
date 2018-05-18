@@ -1003,6 +1003,11 @@ select {
   border: 1px solid #e8e9ea;
   background-color: #fff;
 }
+
+.controls select {
+    width: 100%;
+}
+select
 select[multiple],
 select[size] {
   height: auto;
