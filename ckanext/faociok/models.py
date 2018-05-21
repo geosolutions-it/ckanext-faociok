@@ -192,7 +192,7 @@ class VocabularyTerm(DeclarativeBase):
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, **filters):
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None):
         """
         Returns list of terms for vocabulary
         @param vocabulary_name name of vocabulary
@@ -351,6 +351,10 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         if not term:
             print(_("Skipping row with no term: {}").format(_data))
             continue
+        
+        #if parent and parent == term:
+        #    print(_("Skipping row with parent the same as itself: {}".format(_data)))
+        #    continue
 
         term_from_db = VocabularyTerm.get(vocab, term)
         # print(_("TERM FROM DB ID[{}] DB[{}] ").format(term, term_from_db))
@@ -360,7 +364,6 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
 
         parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
         # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
-        
         VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
         if not VocabularyTerm.get(vocab, term):
             print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))

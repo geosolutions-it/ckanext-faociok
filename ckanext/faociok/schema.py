@@ -5,7 +5,7 @@
 from ckan.common import _, ungettext
 import ckan.plugins.toolkit as t
 from ckan.plugins import PluginImplementations
-from ckanext.faociok.models import Vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 
 def _get_package_schema():
@@ -30,7 +30,7 @@ def _get_package_schema():
           'label': _("M49 Regions"),
           'additional_module': 'm49_regions',
           'vocabulary_name': Vocabulary.VOCABULARY_M49_REGIONS,
-          'vocabulary_filters': {'depth': 2},
+          'vocabulary_filters': [VocabularyTerm._properties.contains('country_code')],
           'description': _("Regions according to UN M.49 Standard"),
           'is_required': False},
     ]
