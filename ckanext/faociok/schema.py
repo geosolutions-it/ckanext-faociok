@@ -19,6 +19,7 @@ def _get_package_schema():
          'multiple': False,
          'type': 'raw',
          'additional_module': None,
+          'vocabulary_filters': {},
          'autocomplete': False,
          'is_required': True,
          },
@@ -31,6 +32,7 @@ def _get_package_schema():
           'label': _("M49 Regions"),
           'additional_module': 'm49_regions',
           'vocabulary_name': Vocabulary.VOCABULARY_M49_REGIONS,
+          'vocabulary_filters': {'depth': 2},
           'description': _("Regions according to UN M.49 Standard"),
           'is_required': False},
     ]
