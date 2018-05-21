@@ -12,7 +12,7 @@
             {% if loop.index0%2==0 %}<div class="clearfix visible-sm"></div>{% endif %}
         {% endif %}
         <div class="col-lg-3 col-md-4 col-sm-6 padding-fix">
-            {% set datatype_url=h.url_for('search', fao_m49_regions=dtype.value) %}
+            {% set datatype_url=h.get_fao_url_for_location(dtype.value) %}
           <div class="fao-item-summary fao-item-m49-regions">
             <a href="{{ datatype_url }}" class="fao-item-header">
               <div class="fao-item-title">{{ dtype.text }}</div>
@@ -27,4 +27,3 @@
     </div>
     </div>
 </div>
-
