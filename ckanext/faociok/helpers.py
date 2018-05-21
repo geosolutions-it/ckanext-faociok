@@ -27,10 +27,11 @@ def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 
 
-def get_vocabulary_items(vocabulary_name, is_multiple=False):
+def get_vocabulary_items(vocabulary_name, is_multiple=False, **filters):
     return VocabularyTerm.get_terms(vocabulary_name,
                                     lang=get_lang(),
-                                    is_multiple=is_multiple)
+                                    is_multiple=is_multiple,
+                                    **filters)
 
 
 def load_json(value, fail=False):
@@ -49,11 +50,12 @@ def get_field_data(data, field):
         return data
 
 
-def get_vocabulary_items_annotated(vocabulary_name, is_multiple=False):
+def get_vocabulary_items_annotated(vocabulary_name, is_multiple=False, **filters):
     return VocabularyTerm.get_terms(vocabulary_name,
                                     lang=get_lang(),
                                     include_dataset_count=True,
-                                    is_multiple=is_multiple)
+                                    is_multiple=is_multiple,
+                                    **filters)
 
 
 def get_groups_featured():

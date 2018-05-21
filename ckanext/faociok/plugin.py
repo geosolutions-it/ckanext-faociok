@@ -98,9 +98,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     def dataset_facets(self, facets_dict, package_type):
         lang = get_lang()
         facets_dict['fao_datatype_{}'.format(lang)] = t._("Data type")
-        for idx, l in enumerate([t._("M49 Level 1 Region"),
-                                 t._("M49 Level 2 Region"),
-                                 t._("M49 Country Level")]):
+        for idx, l in ((0, t._("Regions"),),
+                       (2, t._("Countries"),)):
             facets_dict['fao_m49_regions_l{}_{}'.format(idx, lang)] = l
         return facets_dict
 
