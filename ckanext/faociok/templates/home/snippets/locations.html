@@ -1,4 +1,4 @@
-{% set regions = h.get_faociok_vocabulary_items_annotated('m49_regions')[:4] %}
+{% set regions = h.get_faociok_vocabulary_items_annotated('m49_regions', is_multiple=True)[:4] %}
 
 <div class="module box container module-narrow module-shallow">
     <div class="module-content">
@@ -15,7 +15,7 @@
             {% set datatype_url=h.url_for('search', fao_m49_regions=dtype.value) %}
           <div class="fao-item-summary fao-item-m49-regions">
             <a href="{{ datatype_url }}" class="fao-item-header">
-              <div class="fao-item-title">{{ dtype.text }}</div>
+              <div class="fao-item-title">{{ dtype.text_raw }}</div>
             </a>
             <div class="fao-item-body">
               <div class="fao-item-count">{% trans dataset_count=dtype.dataset_count %}{{ dataset_count }} Dataset{% pluralize dataset_count %}{{ dataset_count }} Datasets{% endtrans %}</div>

@@ -19,6 +19,26 @@ def fao_datatype(value, context):
 def fao_m49_regions(value, context):
     if not value:
         return
+    value = _deserialize_from_array(value)
+    validated = []
+    try:
+        v = Vocabulary.get(Vocabulary.VOCABULARY_M49_REGIONS)
+        for term in value:
+            if not v.valid_term(term):
+                raise ValueError(_("Term not valid: {}").format(term))
+            validated.append(term)
+    except Exception, err:
+        raise Invalid(_("Invalid m49 regions: {} {}").format(value, err))
+    return validated
+
+def _serialize_to_array(value):
+    if not isinstance(value, (list, tuple, set,)):
+        value = [value]
+    serialized = ','.join('{}'.format(v) for v in value)
+    return '{{{}}}'.format(serialized)
+
+def _deserialize_from_array(value):
+
     if not isinstance(value, list):
         try:
             value = json.loads(value)
@@ -40,14 +60,4 @@ def fao_m49_regions(value, context):
     # everything else is ignored
     else:
         raise Invalid(_("Invalid m49 regions value: {}").format(value))
-
-    validated = []
-    try:
-        v = Vocabulary.get(Vocabulary.VOCABULARY_M49_REGIONS)
-        for term in value:
-            if not v.valid_term(term):
-                raise ValueError(_("Term not valid: {}").format(term))
-            validated.append(term)
-    except Exception, err:
-        raise Invalid(_("Invalid m49 regions: {} {}").format(value, err))
-    return json.dumps(validated)
+    return value
