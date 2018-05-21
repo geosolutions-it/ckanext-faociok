@@ -1,6 +1,6 @@
 {# get groups. package_count will return groups with packages only, so we'll fall back to all groups if no package count is available #}
-{% set groups = h.fao_get_action('group_list', {'limit': 4, 'all_fields': True, 'sort': 'package_count'}) or h.fao_get_action('group_list', {'limit': 4, 'all_fields': True}) %}
 
+{% set groups = h.get_fao_groups_featured() %}
 <div class="module box container-fluid module-narrow module-shallow">
     <div class="module-content">
     <h3 class="heading">{{ _('Groups') }}</h3>

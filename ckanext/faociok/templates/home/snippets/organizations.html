@@ -1,11 +1,11 @@
 {# get groups. package_count will return groups with packages only, so we'll fall back to all groups if no package count is available #}
-{% set groups = h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True, 'sort': 'package_count'}) or h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True}) %}
 
+{% set organizations = h.get_fao_organizations_featured() %}
 <div class="module box container-fluid module-narrow module-shallow">
     <div class="module-content">
     <h3 class="heading">{{ _('Organizations') }}</h3>
     <div class="row">
-      {% for group in groups %}
+      {% for group in organizations %}
         {% if loop.index0 > 0 %}
             {% if loop.index0%2==0 %}<div class="clearfix visible-lg"></div>{% endif %}
             {% if loop.index0%1==0 %}<div class="clearfix visible-md clearfix-ie7"></div>{% endif %}

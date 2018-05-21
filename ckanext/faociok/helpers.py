@@ -3,7 +3,7 @@
 
 import json
 from ckan.lib.i18n import get_lang
-import ckan.logic as logic
+from ckan.plugins import toolkit as t
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 
@@ -36,8 +36,20 @@ def load_json(value, fail=False):
 def get_vocabulary_items_annotated(vocabulary_name):
     return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True)
 
-def fao_get_action(action_name, data_dict=None):
-    '''BAD BAD WORKAROUND'''
-    if data_dict is None:
-        data_dict = {}
-    return logic.get_action(action_name)({}, data_dict)
+def get_groups_featured():
+    return _get_featured('group')
+
+def get_organizations_featured():
+    return _get_featured('organization')
+
+def _get_featured(group_type, max_results=4):
+    params_with_pkg = {'limit': 4,
+                        'all_fields': True,
+                        'sort': 'package_count'}
+    params_any = {'limit': 4, 'all_fields': True}
+    call_name = '{}_list'.format(group_type)
+    action = t.get_action(call_name)
+    
+    data = action({}, params_with_pkg)\
+            or action({}, params_any)
+    return data[:max_results]
