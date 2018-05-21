@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+
+try: # for pip >= 10
+    from pip._internal.req import parse_requirements
+    from pip._internal.download import PipSession
+except ImportError: # for pip <= 9.0.3
+    from pip.req import parse_requirements
+    from pip.download import PipSession
+
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
@@ -8,6 +16,12 @@ here = path.abspath(path.dirname(__file__))
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
+
+
+# Parse requirements.txt to get the list of dependencies
+inst_req = parse_requirements('requirements.txt',
+                              session=PipSession())
+REQUIREMENTS = [str(r.req) for r in inst_req]
 
 setup(
     name='''ckanext-faociok''',
@@ -55,13 +69,9 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     namespace_packages=['ckanext'],
 
-    install_requires=[
-      # CKAN extensions should not list dependencies here, but in a separate
-      # ``requirements.txt`` file.
-      #
-      # http://docs.ckan.org/en/latest/extensions/best-practices.html#add-third-party-libraries-to-requirements-txt
-    ],
-
+    # putting requirements to setup so they will be processed when used 
+    # package from pypi
+    install_requires=REQUIREMENTS,
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
