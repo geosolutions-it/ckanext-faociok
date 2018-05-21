@@ -5,6 +5,7 @@ import json
 from ckan.lib.i18n import get_lang
 from ckanext.faociok import validators as v
 from ckan.plugins import toolkit as t
+from ckan.lib import helpers as h
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 
@@ -74,3 +75,12 @@ def _get_featured(group_type, max_results=4):
     data = action({}, params_with_pkg)\
         or action({}, params_any)
     return data[:max_results]
+
+def get_url_for_location(location_code):
+    lang = get_lang()
+    term = VocabularyTerm.get(Vocabulary.VOCABULARY_M49_REGIONS, location_code)
+    if not term:
+        return h.url_for('search')
+    label = term.get_label(lang).label or term.get_label('en').label
+    qdict = {'fao_m49_regions_l{}_{}'.format(term.depth, lang): label}
+    return h.url_for('search', **qdict)
