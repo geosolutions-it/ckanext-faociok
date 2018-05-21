@@ -7,8 +7,9 @@ import csv
 
 from ckan.common import _, ungettext
 from ckan.model import Package, PackageExtra, Session
+
 from sqlalchemy import types, Column, ForeignKey, Index, Table
-from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal
+from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal, inspect
 from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
@@ -156,7 +157,7 @@ class VocabularyTerm(DeclarativeBase):
         return inst
 
     @classmethod
-    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False):
+    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False):
         s = Session
         if not include_dataset_count:
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
@@ -165,9 +166,13 @@ class VocabularyTerm(DeclarativeBase):
                                                                 VocabularyLabel.lang==lang)\
                                                         .order_by(cls.path)
         else:
-
-            #value_cond = PackageExtra.value == cls.name
-            value_cond = PackageExtra.value == cls.name
+            if is_multiple:
+                oth = inspect(PackageExtra)
+                value_cond = '{} =any({}::varchar[])'.format(cls.__table__.c['name'],
+                                                                oth.c['value'])
+            else:
+                #value_cond = PackageExtra.value == cls.name
+                value_cond = PackageExtra.value == cls.name
 
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id, func.count(distinct(Package.id)).label('cnt')).join(Vocabulary)\
                                                         .outerjoin(VocabularyLabel)\
@@ -185,7 +190,7 @@ class VocabularyTerm(DeclarativeBase):
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False):
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False):
         """
         Returns list of terms for vocabulary
         @param vocabulary_name name of vocabulary
@@ -200,7 +205,7 @@ class VocabularyTerm(DeclarativeBase):
                 (optionally, if include_dataset_count flag is set):
                 * dataset_count
         """
-        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count)
+        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count, is_multiple=is_multiple)
         keys = ('value', 'text', 'depth', 'id',)
         if include_dataset_count:
             keys += ('dataset_count',)
