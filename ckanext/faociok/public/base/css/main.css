@@ -185,6 +185,7 @@ textarea {
 }
 .input-block-level {
   display: block;
+
   width: 100%;
   min-height: 30px;
   -webkit-box-sizing: border-box;
@@ -10549,11 +10550,12 @@ h5 {
 /* home page */
 
 .fao-item-summary {
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-left: 0;
+  margin-right: 0;
   border-left: none;
-  border-radius: 3px;
-  background: #eee;
+  border-radius: 0;
+  background: #ffffff;
+  border: 1px solid #ddd;
   position: relative;
   padding: 0 0 0 0;
   margin-bottom: 30px;
@@ -10578,7 +10580,7 @@ h5 {
   font-size: 17px;
   line-height: 22px;
   color: #393939;
-  min-height: 54px; 
+  min-height: 54px;
 }
 .fao-item-summary .fao-item-body {
   border-right: none;
@@ -10631,29 +10633,138 @@ h5 {
 }
 
 .padding-fix {
-    padding: 0px;
+  padding: 0px;
 }
 
-.fao-datatype-microdata .fao-item-body {
-    background-image: url('/base/images/faociok/fao-datatype-microdata.png');
-
+.fao-datatype-microdata .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-microdata.png');
 }
-.fao-datatype-geospatial-data  .fao-item-body{
-    background-image: url('/base/images/faociok/fao-datatype-geospatial-data.png');
-
+.fao-datatype-geospatial-data  .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-geospatial-data.png');
 }
 
-.fao-datatype-time-series .fao-item-body {
-    background-image: url('/base/images/faociok/fao-datatype-time-series.png');
-
-}
-.fao-datatype-corpo-monitoring .fao-item-body {
-    background-image: url('/base/images/faociok/fao-datatype-corpo-monitoring.png');
-
-}
-.fao-datatype-other .fao-item-body {
-    background-image: url('/base/images/faociok/fao-datatype-other.png');
-
+.fao-datatype-geospatial .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-geospatial-data.png');
 }
 
+.fao-datatype-time-series .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-time-series.png');
+}
+
+.fao-datatype-timeseries .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-time-series.png');
+}
+
+.fao-datatype-corpo-monitoring .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-corpo-monitoring.png');
+}
+
+.fao-datatype-monitoring .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-corpo-monitoring.png');
+}
+.fao-datatype-other .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-datatype-other.png');
+}
+
+/* fix */
+
+.homepage.layout-1 .fao-item-summary {
+  transition: box-shadow 0.3s;
+  overflow: hidden;
+  margin-right: 0;
+}
+
+.homepage.layout-1 .fao-item-summary a:hover {
+  text-decoration: none;
+}
+
+.homepage.layout-1 .fao-item-summary .fao-item-thumbnail {
+  height: 100px;
+  background-color: #dddddd;
+  background-size: 100% auto;
+  background-position: center;
+
+}
+
+.homepage.layout-1 .fao-item-summary .fao-item-body {
+  padding: 0;
+  overflow: hidden;
+}
+
+.homepage.layout-1 .fao-item-summary .fao-item-body .fao-item-count {
+  width: calc(100% - 16px);
+  text-align: center;
+  font-size: 11px;
+  line-height: 11px;
+  padding: 8px 4px;
+  margin: 0 8px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border-top: 1px solid #dddddd;
+}
+
+.homepage.layout-1 .fao-item-summary .fao-item-body .fao-item-count strong {
+  color: #444;
+}
+
+.homepage.layout-1 .fao-item-summary .clearfix {
+  height: 0;
+}
+
+.homepage.layout-1 .fao-item-summary:hover {
+  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.homepage.layout-1 .col1 .module-content .row {
+  padding: 0 20px;
+}
+
+.homepage.layout-1 .col1 .module-content h3 {
+  padding: 0 20px;
+}
+.homepage.layout-1 .fao-item-title {
+  height: 60px;
+  color: #0d6cac;
+}
+.homepage.layout-1 .fao-item-title h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.homepage.layout-1 .row-fluid > div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.homepage.layout-1 .row-fluid + .row-fluid {
+  margin-top: 15px;
+}
+
+.homepage.layout-1 .fao-item-see-all {
+  text-align: right;
+  margin-top: 14px;
+}
+
+.homepage.layout-1 .container + .container {
+  margin-top: 15px;
+}
+.homepage.layout-1 .container-fluid.box {
+  background: #ffffff url("../../../base/images/bg.png");
+}
+
+.homepage.layout-1 .fao-static-links-footer {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.homepage.layout-1 .fao-static-links-footer hr {
+  margin-bottom: 0;
+}
+
+.homepage.layout-1 .fao-static-links-footer h3 {
+  font-weight: bold;
+}
 /* end home page */

@@ -1,29 +1,39 @@
 {# get groups. package_count will return groups with packages only, so we'll fall back to all groups if no package count is available #}
 {% set groups = h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True, 'sort': 'package_count'}) or h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True}) %}
 
-<div class="module box container-fluid module-narrow module-shallow">
-    <div class="module-content">
-    <h3 class="heading">{{ _('Organizations') }}</h3>
-    <div class="row">
-      {% for group in groups %}
-        {% if loop.index0 > 0 %}
-            {% if loop.index0%2==0 %}<div class="clearfix visible-lg"></div>{% endif %}
-            {% if loop.index0%1==0 %}<div class="clearfix visible-md clearfix-ie7"></div>{% endif %}
-            {% if loop.index0%1==0 %}<div class="clearfix visible-sm"></div>{% endif %}
-        {% endif %}
-        <div class="col-lg-6 col-md-12 col-sm-12 padding-fix">
-            {% set group_url=h.url_for('group_read', id=group.name) %}
-          <div class="fao-item-summary fao-item-group">
-            <a href="{{ group_url }}" class="fao-item-header">
-              <div class="fao-item-title">{{ group.title }}</div>
-            </a>
-            <div class="fao-item-body"  style="background-image: url('{{ group.image_display_url }}')">
-              <div class="fao-item-count">{% trans dataset_count=group.package_count %}{{ dataset_count }} Dataset{% pluralize dataset_count %}{{ dataset_count }} Datasets{% endtrans %}</div>
-              <div class="clearfix clearfix-ie7"> &nbsp;</div>
-            </div>
+<div class="container-fluid box">
+  <div class="row-fluid">
+    <div class="col-xs-8">
+      <h3 class="heading">{{ _('Organizations') }}</h3>
+    </div>
+    <div class="col-xs-4">
+      {% set organizations_url=h.url_for('organization') %}
+      <a href="{{ organizations_url }}"><div class="fao-item-see-all">{{_('See all')}}</div></a>
+    </div>
+  </div>
+  <div class="row-fluid">
+  {% for group in groups %}
+    <div class="col-lg-6 col-md-12 col-sm-12">
+    {% set group_url=h.url_for('organization_read', id=group.name) %}
+      <div class="fao-item-summary fao-item-group">
+        <a href="{{ group_url }}" class="fao-item-header">
+          {% if (group.image_display_url)%}
+          <div class="fao-item-thumbnail" style="background-image: url('{{ group.image_display_url }}')"></div>
+          {% else %}
+          <div class="fao-item-thumbnail" style="background-image: url('/base/images/placeholder-organization.png')"></div>
+          {% endif %}
+          <div class="fao-item-title"><h3 title="{{ group.title }}">{{ h.truncate(group.title, length=45, whole_word=True) }}</h3></div>
+          <div class="fao-item-body">
+            {% set dataset_count=group.package_count %}
+            {% if (dataset_count == 0) %}
+            <div class="fao-item-count">{% trans %}{{ dataset_count }} Dataset{% endtrans %}</div>
+            {% else %}
+            <div class="fao-item-count"><strong>{% trans %}{{ dataset_count }} Datasets{% endtrans %}</strong></div>
+            {% endif %}
           </div>
-        </div>
-      {% endfor %}
+        </a>
+      </div>
     </div>
-    </div>
+  {% endfor %}
+  </div>
 </div>
