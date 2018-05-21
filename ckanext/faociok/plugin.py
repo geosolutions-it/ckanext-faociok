@@ -87,6 +87,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_faociok_package_schema': s._get_package_schema,
             'get_fao_datatype': h.get_fao_datatype,
             'get_fao_m49_region': h.get_fao_m49_region,
+            'get_fao_url_for_location': h.get_url_for_location,
             'load_json': h.load_json,
             'fao_get_action': h.fao_get_action,
         }
