@@ -92,6 +92,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'load_json': h.load_json,
             'get_fao_groups_featured': h.get_groups_featured,
             'get_fao_organizations_featured': h.get_organizations_featured,
+            'get_fao_locations_featured': h.get_locations_featured,
         }
 
     # IFacets
@@ -102,6 +103,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
                        (2, t._("Countries"),)):
             facets_dict['fao_m49_regions_l{}_{}'.format(idx, lang)] = l
         return facets_dict
+
+    # IPackageController
 
     def get_localized_regions(self, regions):
         out = {'fao_m49_regions': regions}

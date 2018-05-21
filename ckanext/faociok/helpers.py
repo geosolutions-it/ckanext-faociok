@@ -57,6 +57,11 @@ def get_vocabulary_items_annotated(vocabulary_name, is_multiple=False, filters=N
                                     is_multiple=is_multiple,
                                     filters=filters)
 
+def get_locations_featured():
+    lang = get_lang()
+    return VocabularyTerm.get_most_frequent_parent(Vocabulary.VOCABULARY_M49_REGIONS, lang=lang, multiple=True, limit=4)
+    #return get_vocabulary_items_annotated('m49_regions', is_multiple=True, filters={'depth':0})[:4]
+
 
 def get_groups_featured():
     return _get_featured('group')

@@ -246,6 +246,50 @@ class VocabularyTerm(DeclarativeBase):
             out.append(attr == v)
         return out
 
+    @classmethod
+    def get_most_frequent_parent(cls, vocabulary, lang, multiple=False, limit=None):
+        if multiple:
+            oth = inspect(PackageExtra)
+            value_cond = '{} =any({}::varchar[])'.format(cls.__table__.c['name'],
+                                                    oth.c['value'])
+        else:
+            #value_cond = PackageExtra.value == cls.name
+            value_cond = PackageExtra.value == cls.name
+
+
+        q = Session.query(VocabularyTerm.name, VocabularyTerm.path, func.count(1))\
+                   .join(Vocabulary, and_(Vocabulary.id==VocabularyTerm.vocabulary_id,
+                                          Vocabulary.name==vocabulary))\
+                   .join(PackageExtra,
+                                and_(PackageExtra.key=='fao_{}'.format(vocabulary),
+                                     value_cond))\
+                   .group_by(VocabularyTerm.name, VocabularyTerm.path)
+
+        # dummy implementation of per-parent counts
+        out = []
+        _counts = {}
+        _rev_counts = {}
+
+        for item in q:
+            parent = item[1].split('/')[0]
+            try:
+                _counts[parent] += item[2]
+            except KeyError:
+                _counts[parent] = item[2]
+        for k,v in _counts.items():
+            try:
+                _rev_counts[v].append(k)
+            except KeyError:
+                _rev_counts[v] = [k]
+        for k in sorted(_rev_counts.keys(), reverse=True):
+            for v in sorted(_rev_counts[k]):
+                term = VocabularyTerm.get(vocabulary, v)
+                text = v
+                if term:
+                    text = term.get_label(lang).label or term.get_label('en').label or v
+
+                out.append({'name': v, 'dataset_count': k, 'text': text})
+        return out
 
 class VocabularyLabel(DeclarativeBase):
     __tablename__ = 'faociok_vocabulary_label'
