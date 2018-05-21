@@ -88,7 +88,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_fao_datatype': h.get_fao_datatype,
             'get_fao_m49_region': h.get_fao_m49_region,
             'load_json': h.load_json,
-            'fao_get_action': h.fao_get_action,
+            'get_fao_groups_featured': h.get_groups_featured,
+            'get_fao_organizations_featured': h.get_organizations_featured,
         }
 
     # IFacets
