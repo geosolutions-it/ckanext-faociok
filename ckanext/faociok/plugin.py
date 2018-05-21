@@ -89,7 +89,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_fao_m49_region': h.get_fao_m49_region,
             'get_faociok_field_data': h.get_field_data,
             'load_json': h.load_json,
-
+            'fao_get_action': h.fao_get_action,
         }
 
     # IFacets

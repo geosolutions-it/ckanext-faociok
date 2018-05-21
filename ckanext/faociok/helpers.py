@@ -4,6 +4,7 @@
 import json
 from ckan.lib.i18n import get_lang
 from ckanext.faociok import validators as v
+import ckan.logic as logic
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 
@@ -41,3 +42,12 @@ def get_field_data(data, field):
 
 def get_vocabulary_items_annotated(vocabulary_name, is_multiple=False):
     return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True, is_multiple=is_multiple)
+
+def get_vocabulary_items_annotated(vocabulary_name):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True)
+
+def fao_get_action(action_name, data_dict=None):
+    '''BAD BAD WORKAROUND'''
+    if data_dict is None:
+        data_dict = {}
+    return logic.get_action(action_name)({}, data_dict)
