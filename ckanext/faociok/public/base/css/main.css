@@ -10728,10 +10728,17 @@ h5 {
 .homepage.layout-1 .fao-item-title {
   height: 60px;
   color: #0d6cac;
+  display: flex;
+  align-content: center;
 }
 .homepage.layout-1 .fao-item-title h3 {
   margin: 0;
   font-size: 16px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
 }
 .homepage.layout-1 .row-fluid > div {
   -webkit-box-sizing: border-box;
