@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import ckan.plugins.toolkit as toolkit
+
 import json
 from ckan.lib.i18n import get_lang
 import ckan.logic as logic
@@ -41,3 +43,17 @@ def fao_get_action(action_name, data_dict=None):
     if data_dict is None:
         data_dict = {}
     return logic.get_action(action_name)({}, data_dict)
+
+def most_popular_groups(n):
+    '''Return a sorted list of the groups with the most datasets.'''
+    # Get a list of all the site's groups from CKAN, sorted by number of
+    # datasets.
+    groups = toolkit.get_action('group_list')(
+        data_dict={ 'all_fields': True})
+
+    # Truncate the list to the n most popular groups only.
+    groups = sorted(groups, key=lambda k: k['package_count'], reverse=True) 
+    groups = groups[:n]
+     
+
+    return groups
