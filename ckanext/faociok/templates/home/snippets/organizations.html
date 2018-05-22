@@ -12,7 +12,7 @@
     </div>
   </div>
   <div class="row-fluid">
-  {% for group in groups %}
+  {% for group in organizations %}
     <div class="col-lg-6 col-md-12 col-sm-12">
     {% set group_url=h.url_for('organization_read', id=group.name) %}
       <div class="fao-item-summary fao-item-group">
