@@ -7,8 +7,9 @@ import csv
 
 from ckan.common import _, ungettext
 from ckan.model import Package, PackageExtra, Session
+
 from sqlalchemy import types, Column, ForeignKey, Index, Table
-from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal
+from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal, inspect
 from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
@@ -156,18 +157,22 @@ class VocabularyTerm(DeclarativeBase):
         return inst
 
     @classmethod
-    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False):
+    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None):
         s = Session
         if not include_dataset_count:
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
                                                         .outerjoin(VocabularyLabel)\
                                                         .filter(Vocabulary.name==vocabulary_name,
                                                                 VocabularyLabel.lang==lang)\
-                                                        .order_by(cls.path)
+                                                        .order_by(cls.name)
         else:
-
-            #value_cond = PackageExtra.value == cls.name
-            value_cond = PackageExtra.value == cls.name
+            if is_multiple:
+                oth = inspect(PackageExtra)
+                value_cond = '{} =any({}::varchar[])'.format(cls.__table__.c['name'],
+                                                                oth.c['value'])
+            else:
+                #value_cond = PackageExtra.value == cls.name
+                value_cond = PackageExtra.value == cls.name
 
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id, func.count(distinct(Package.id)).label('cnt')).join(Vocabulary)\
                                                         .outerjoin(VocabularyLabel)\
@@ -181,16 +186,19 @@ class VocabularyTerm(DeclarativeBase):
                                                         .filter(Vocabulary.name==vocabulary_name,
                                                                 VocabularyLabel.lang==lang)\
                                                         .group_by(cls.name, VocabularyLabel.label, cls.depth, cls.id)\
-                                                        .order_by(desc('cnt'))
+                                                        .order_by(desc('cnt'), cls.name)
+        if filters:
+            q = q.filter(*filters)
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False):
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None):
         """
         Returns list of terms for vocabulary
         @param vocabulary_name name of vocabulary
         @param lang 2-char lang code
         @param include_dataset_count returns number of active datasets using this term (default: no)
+        @param filters addictional terms query filters_by arguments
 
         @rtype list of items:
                 * term name
@@ -200,7 +208,8 @@ class VocabularyTerm(DeclarativeBase):
                 (optionally, if include_dataset_count flag is set):
                 * dataset_count
         """
-        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count)
+        _filters=cls.make_filters(filters)
+        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count, is_multiple=is_multiple, filters=_filters)
         keys = ('value', 'text', 'depth', 'id',)
         if include_dataset_count:
             keys += ('dataset_count',)
@@ -210,11 +219,77 @@ class VocabularyTerm(DeclarativeBase):
             out['text'] = row[1] or row[0]
             formatted_elements = '-' * out['depth'], ' ' if out['depth'] else '', out['text'],
             out['text_raw'] = out['text']
-            out['text'] = u'{}{}{}'.format(*formatted_elements)
+            #out['text'] = u'{}{}{}'.format(*formatted_elements)
             return out
 
         return [make_row(row) for row in q]
 
+    @classmethod
+    def make_filters(cls, filters):
+        """
+        Translate dictionary of key->value into query.filter(..) values from VocabularyTerm
+        @param filters dictionary of VocabularyTerm columns->values or list of filters
+        """
+        # no filters, bye
+        if not filters:
+            return
+        # anything else than dict, we assume it's already a list of filters
+        if not isinstance(filters, dict):
+            return filters
+        
+        out = []
+        for k,v in filters.items():
+            attr = getattr(VocabularyTerm, k, None)
+            print('got attr', k, attr)
+            if not attr:
+                pass
+            out.append(attr == v)
+        return out
+
+    @classmethod
+    def get_most_frequent_parent(cls, vocabulary, lang, multiple=False, limit=None):
+        if multiple:
+            oth = inspect(PackageExtra)
+            value_cond = '{} =any({}::varchar[])'.format(cls.__table__.c['name'],
+                                                    oth.c['value'])
+        else:
+            #value_cond = PackageExtra.value == cls.name
+            value_cond = PackageExtra.value == cls.name
+
+
+        q = Session.query(VocabularyTerm.name, VocabularyTerm.path, func.count(1))\
+                   .join(Vocabulary, and_(Vocabulary.id==VocabularyTerm.vocabulary_id,
+                                          Vocabulary.name==vocabulary))\
+                   .join(PackageExtra,
+                                and_(PackageExtra.key=='fao_{}'.format(vocabulary),
+                                     value_cond))\
+                   .group_by(VocabularyTerm.name, VocabularyTerm.path)
+
+        # dummy implementation of per-parent counts
+        out = []
+        _counts = {}
+        _rev_counts = {}
+
+        for item in q:
+            parent = item[1].split('/')[0]
+            try:
+                _counts[parent] += item[2]
+            except KeyError:
+                _counts[parent] = item[2]
+        for k,v in _counts.items():
+            try:
+                _rev_counts[v].append(k)
+            except KeyError:
+                _rev_counts[v] = [k]
+        for k in sorted(_rev_counts.keys(), reverse=True):
+            for v in sorted(_rev_counts[k]):
+                term = VocabularyTerm.get(vocabulary, v)
+                text = v
+                if term:
+                    text = term.get_label(lang).label or term.get_label('en').label or v
+
+                out.append({'name': v, 'dataset_count': k, 'text': text})
+        return out
 
 class VocabularyLabel(DeclarativeBase):
     __tablename__ = 'faociok_vocabulary_label'
@@ -320,6 +395,10 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         if not term:
             print(_("Skipping row with no term: {}").format(_data))
             continue
+        
+        #if parent and parent == term:
+        #    print(_("Skipping row with parent the same as itself: {}".format(_data)))
+        #    continue
 
         term_from_db = VocabularyTerm.get(vocab, term)
         # print(_("TERM FROM DB ID[{}] DB[{}] ").format(term, term_from_db))
@@ -329,7 +408,6 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
 
         parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
         # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
-        
         VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
         if not VocabularyTerm.get(vocab, term):
             print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))

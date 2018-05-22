@@ -1,6 +1,6 @@
 {# get groups. package_count will return groups with packages only, so we'll fall back to all groups if no package count is available #}
-{% set groups = h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True, 'sort': 'package_count'}) or h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True}) %}
 
+{% set organizations = h.get_fao_organizations_featured() %}
 <div class="container-fluid box">
   <div class="row-fluid">
     <div class="col-xs-8">
