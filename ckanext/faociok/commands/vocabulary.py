@@ -74,31 +74,24 @@ class VocabularyCommands(CkanCommand):
         wb = load_workbook(in_file)
         sheet = wb.active
 
-        IDX_COUNTRY_CODE = 1
-        IDX_ALPHA3_CODE = 2
+        IDX_COUNTRY_M49 = 1
+        IDX_COUNTRY_ISO3 = 2
         IDX_COUNTRY_NAME = 3
-        IDX_L1_CODE = 8
+        IDX_L1_M49 = 8
         IDX_L1_NAME = 9
-        IDX_L2_CODE = 10
-        IDX_L2_NAME = 11
+        #IDX_L2_CODE = 10
+        #IDX_L2_NAME = 11
 
-        level1_cells = (IDX_L1_CODE, IDX_L1_NAME,)
-        level2_cells = (IDX_L2_CODE, IDX_L2_NAME,)
-        level2_parent_cell = IDX_L1_CODE
-        countries_cells = (IDX_COUNTRY_CODE,IDX_COUNTRY_NAME, IDX_ALPHA3_CODE)
-        countries_parent_cell = IDX_L2_CODE
+        level1_cells = (IDX_L1_M49, IDX_L1_NAME,)
+        countries_cells = (IDX_COUNTRY_M49, IDX_COUNTRY_NAME, IDX_COUNTRY_ISO3)
+        countries_parent_cell = IDX_L1_M49
 
         countries = {}  # key: id , value : row
         level1 = {}     # key: id , value : row
-        level2 = {}     # key: id , value : row
-        
-        # 
-        combine_data = ((countries_cells, countries_parent_cell, countries,),
-                        (level1_cells, None, level1,),
-                        (level2_cells, level2_parent_cell, level2,))
-        
+
         for row in sheet.iter_rows(min_row=6):
-            for indexes, parent_idx, container in combine_data:
+            for indexes, parent_idx, container in ((countries_cells, countries_parent_cell, countries,),
+                                                   (level1_cells, None, level1,)):
                 # ( parent, data..)
                 rdata = []
                 rdata.append(row[parent_idx-1].value if parent_idx else None)
@@ -118,9 +111,6 @@ class VocabularyCommands(CkanCommand):
         w.writerow(['parent', 'term', 'property:country_code', 'lang:en', 'lang:fr', 'lang:es'])
         for id,r in level1.iteritems():
             # print('L1 ROW {}: {}'.format(id,r))
-            w.writerow([r[0]] + [r[1]] + [""] + [r[2]] + [r[2]+" [FR]"] + [r[2]+" [ES]"] )
-        for id,r in level2.iteritems():
-            # print('L2 ROW {}: {}'.format(id,r))
             w.writerow([r[0]] + [r[1]] + [""] + [r[2]] + [r[2]+" [FR]"] + [r[2]+" [ES]"] )
         for id,r in countries.iteritems():
             # print('CNTY ROW {}: {}'.format(id,r))
