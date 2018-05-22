@@ -292,7 +292,10 @@ class VocabularyTerm(DeclarativeBase):
             count = item[2]
             parent = VocabularyTerm.get_by_id(parent_id)
             text = parent.get_label(lang).label or parent.get_label('en').label or v
-            out.append({'name': parent_name, 'dataset_count': count, 'text': text})
+            out.append({'name': parent_name,
+                        'dataset_count': count,
+                        'value': parent_name,
+                        'text': text})
         return out
 
 class VocabularyLabel(DeclarativeBase):
