@@ -87,20 +87,25 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_faociok_package_schema': s._get_package_schema,
             'get_fao_datatype': h.get_fao_datatype,
             'get_fao_m49_region': h.get_fao_m49_region,
+            'get_faociok_field_data': h.get_field_data,
+            'get_fao_url_for_location': h.get_url_for_location,
             'load_json': h.load_json,
-            'fao_get_action': h.fao_get_action,
             'most_popular_groups': h.most_popular_groups,
+            'get_fao_groups_featured': h.get_groups_featured,
+            'get_fao_organizations_featured': h.get_organizations_featured,
+            'get_fao_locations_featured': h.get_locations_featured,
         }
 
     # IFacets
     def dataset_facets(self, facets_dict, package_type):
         lang = get_lang()
         facets_dict['fao_datatype_{}'.format(lang)] = t._("Data type")
-        for idx, l in enumerate([t._("M49 Level 1 Region"),
-                                 t._("M49 Level 2 Region"),
-                                 t._("M49 Country Level")]):
+        for idx, l in ((0, t._("Regions"),),
+                       (1, t._("Countries"),)):
             facets_dict['fao_m49_regions_l{}_{}'.format(idx, lang)] = l
         return facets_dict
+
+    # IPackageController
 
     def get_localized_regions(self, regions):
         out = {'fao_m49_regions': regions}
@@ -132,7 +137,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         regions = pkg_dict.get('fao_m49_regions')
         if regions:
             if not isinstance(regions, list):
-                regions = json.loads(regions)
+                regions = v._deserialize_from_array(regions)
             localized_regions = self.get_localized_regions(regions)
             pkg_dict.update(localized_regions)
         if pkg_dict.get('fao_datatype'):

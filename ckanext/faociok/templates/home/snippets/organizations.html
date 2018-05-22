@@ -1,6 +1,6 @@
 {# get groups. package_count will return groups with packages only, so we'll fall back to all groups if no package count is available #}
-{% set groups = h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True, 'sort': 'package_count'}) or h.fao_get_action('organization_list', {'limit': 4, 'all_fields': True}) %}
 
+{% set organizations = h.get_fao_organizations_featured() %}
 <div class="container-fluid box">
   <div class="row-fluid">
     <div class="col-xs-8">
@@ -12,7 +12,7 @@
     </div>
   </div>
   <div class="row-fluid">
-  {% for group in groups %}
+  {% for group in organizations %}
     <div class="col-lg-6 col-md-12 col-sm-12">
     {% set group_url=h.url_for('organization_read', id=group.name) %}
       <div class="fao-item-summary fao-item-group">
