@@ -98,6 +98,11 @@ class VocabularyCommands(CkanCommand):
                 
                 for idx in indexes:
                     value = row[idx-1].value
+                    try:
+                        value = value.replace('(M49)', '').replace('(MDG=M49)', '') if value else value
+                    except AttributeError:
+                        # prolly it has been parsed as a number
+                        pass
                     rdata.append(value.encode('utf-8') if isinstance(value, unicode) else value)
 
                 if not any(rdata):
