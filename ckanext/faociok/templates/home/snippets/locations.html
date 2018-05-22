@@ -1,4 +1,4 @@
-{% set regions = h.get_faociok_vocabulary_items_annotated('m49_regions')[:4] %}
+{% set regions = h.get_fao_locations_featured() %}
 
 <div class="container-fluid box">
   <div class="row-fluid">
@@ -9,7 +9,7 @@
   <div class="row-fluid">
   {% for dtype in regions %}
     <div class="col-lg-3 col-md-3 col-sm-6">
-    {% set datatype_url=h.url_for('search', fao_m49_regions=dtype.value) %}
+    {% set datatype_url=h.get_fao_url_for_location(dtype.value) %}
       <div class="fao-item-summary fao-item-m49-regions">
         <a href="{{ datatype_url }}" class="fao-item-header">
           <div class="fao-item-title"><h3 title="{{ dtype.text }}">{{ h.truncate(dtype.text, length=45, whole_word=True) }}</h3></div>

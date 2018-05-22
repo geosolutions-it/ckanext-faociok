@@ -5,7 +5,7 @@
 from ckan.common import _, ungettext
 import ckan.plugins.toolkit as t
 from ckan.plugins import PluginImplementations
-from ckanext.faociok.models import Vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm, VocabularyLabel
 
 
 def _get_package_schema():
@@ -17,8 +17,8 @@ def _get_package_schema():
          'vocabulary_name': Vocabulary.VOCABULARY_DATATYPE,
          'description': _("Select data type of dataset"),
          'multiple': False,
-         'type': 'raw',
          'additional_module': None,
+          'vocabulary_filters': {},
          'autocomplete': False,
          'is_required': True,
          },
@@ -26,11 +26,12 @@ def _get_package_schema():
           'validators': [t.get_validator('ignore_missing'), t.get_validator('fao_m49_regions')],
           'element': 'select',
           'multiple': True,
-          'type': 'json',
           'autocomplete': True,
           'label': _("M49 Regions"),
           'additional_module': 'm49_regions',
           'vocabulary_name': Vocabulary.VOCABULARY_M49_REGIONS,
+          'vocabulary_filters': [VocabularyTerm.depth == 1],
+          'vocabulary_order_by': [VocabularyLabel.label],
           'description': _("Regions according to UN M.49 Standard"),
           'is_required': False},
     ]
