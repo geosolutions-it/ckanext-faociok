@@ -124,6 +124,10 @@ class VocabularyTerm(DeclarativeBase):
         self.path = path
 
     @classmethod
+    def get_by_id(cls, item_id):
+        return Session.query(cls).filter(cls.id==item_id).one()
+
+    @classmethod
     def get(cls, vocab, name):
         if isinstance(vocab, Vocabulary):
             item = Session.query(cls).filter(cls.vocabulary_id==vocab.id,
@@ -248,47 +252,38 @@ class VocabularyTerm(DeclarativeBase):
 
     @classmethod
     def get_most_frequent_parent(cls, vocabulary, lang, multiple=False, limit=None):
+
+        children = orm.aliased(VocabularyTerm, name='children_vocab_term')
+        oth = inspect(PackageExtra)
+
         if multiple:
-            oth = inspect(PackageExtra)
-            value_cond = '{} =any({}::varchar[])'.format(cls.__table__.c['name'],
-                                                    oth.c['value'])
+            value_cond = '{} =any({}::varchar[])'.format('children_vocab_term.name',
+                                                         oth.c.value)
         else:
             #value_cond = PackageExtra.value == cls.name
-            value_cond = PackageExtra.value == cls.name
-
-
-        q = Session.query(VocabularyTerm.name, VocabularyTerm.path, func.count(1))\
+            value_cond = PackageExtra.value == children.name
+        
+        q = Session.query(VocabularyTerm.id, VocabularyTerm.name, func.count(1).label('cnt'))\
                    .join(Vocabulary, and_(Vocabulary.id==VocabularyTerm.vocabulary_id,
                                           Vocabulary.name==vocabulary))\
+                   .join(children, VocabularyTerm.id==children.parent_id)\
                    .join(PackageExtra,
-                                and_(PackageExtra.key=='fao_{}'.format(vocabulary),
+                              and_(PackageExtra.key=='fao_{}'.format(vocabulary),
                                      value_cond))\
-                   .group_by(VocabularyTerm.name, VocabularyTerm.path)
+                   .group_by(VocabularyTerm.id, VocabularyTerm.name)\
+                   .order_by(desc('cnt'), VocabularyTerm.name)
+        if limit:
+            q = q.limit(limit)
 
-        # dummy implementation of per-parent counts
+        print(q)
         out = []
-        _counts = {}
-        _rev_counts = {}
-
         for item in q:
-            parent = item[1].split('/')[0]
-            try:
-                _counts[parent] += item[2]
-            except KeyError:
-                _counts[parent] = item[2]
-        for k,v in _counts.items():
-            try:
-                _rev_counts[v].append(k)
-            except KeyError:
-                _rev_counts[v] = [k]
-        for k in sorted(_rev_counts.keys(), reverse=True):
-            for v in sorted(_rev_counts[k]):
-                term = VocabularyTerm.get(vocabulary, v)
-                text = v
-                if term:
-                    text = term.get_label(lang).label or term.get_label('en').label or v
-
-                out.append({'name': v, 'dataset_count': k, 'text': text})
+            parent_id = item[0]
+            parent_name = item[1]
+            count = item[2]
+            parent = VocabularyTerm.get_by_id(parent_id)
+            text = parent.get_label(lang).label or parent.get_label('en').label or v
+            out.append({'name': parent_name, 'dataset_count': count, 'text': text})
         return out
 
 class VocabularyLabel(DeclarativeBase):
