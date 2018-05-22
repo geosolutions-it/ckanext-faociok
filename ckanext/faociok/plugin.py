@@ -90,6 +90,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_faociok_field_data': h.get_field_data,
             'get_fao_url_for_location': h.get_url_for_location,
             'load_json': h.load_json,
+            'most_popular_groups': h.most_popular_groups,
             'get_fao_groups_featured': h.get_groups_featured,
             'get_fao_organizations_featured': h.get_organizations_featured,
             'get_fao_locations_featured': h.get_locations_featured,
