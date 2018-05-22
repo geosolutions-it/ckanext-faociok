@@ -27,11 +27,12 @@ def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 
 
-def get_vocabulary_items(vocabulary_name, is_multiple=False, filters=None):
+def get_vocabulary_items(vocabulary_name, is_multiple=False, filters=None, order_by=None):
     return VocabularyTerm.get_terms(vocabulary_name,
                                     lang=get_lang(),
                                     is_multiple=is_multiple,
-                                    filters=filters)
+                                    filters=filters,
+                                    order_by=order_by)
 
 
 def load_json(value, fail=False):

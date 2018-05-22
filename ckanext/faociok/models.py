@@ -161,14 +161,17 @@ class VocabularyTerm(DeclarativeBase):
         return inst
 
     @classmethod
-    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None):
+    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None, order_by=None):
         s = Session
         if not include_dataset_count:
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
                                                         .outerjoin(VocabularyLabel)\
                                                         .filter(Vocabulary.name==vocabulary_name,
-                                                                VocabularyLabel.lang==lang)\
-                                                        .order_by(cls.name)
+                                                                VocabularyLabel.lang==lang)
+            if order_by:
+                q = q.order_by(*order_by)
+            else:
+                q = q.order_by(cls.name)
         else:
             if is_multiple:
                 oth = inspect(PackageExtra)
@@ -189,14 +192,17 @@ class VocabularyTerm(DeclarativeBase):
                                                                      Package.state=='active'))\
                                                         .filter(Vocabulary.name==vocabulary_name,
                                                                 VocabularyLabel.lang==lang)\
-                                                        .group_by(cls.name, VocabularyLabel.label, cls.depth, cls.id)\
-                                                        .order_by(desc('cnt'), cls.name)
+                                                        .group_by(cls.name, VocabularyLabel.label, cls.depth, cls.id)
+            if order_by:
+                q = q.order_by(*order_by)
+            else:
+                q = q.order_by(desc('cnt'), cls.name)
         if filters:
             q = q.filter(*filters)
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None):
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None, order_by=None):
         """
         Returns list of terms for vocabulary
         @param vocabulary_name name of vocabulary
@@ -213,7 +219,12 @@ class VocabularyTerm(DeclarativeBase):
                 * dataset_count
         """
         _filters=cls.make_filters(filters)
-        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count, is_multiple=is_multiple, filters=_filters)
+        q = cls.get_terms_q(vocabulary_name,
+                            lang,
+                            include_dataset_count=include_dataset_count,
+                            is_multiple=is_multiple,
+                            filters=_filters,
+                            order_by=order_by)
         keys = ('value', 'text', 'depth', 'id',)
         if include_dataset_count:
             keys += ('dataset_count',)

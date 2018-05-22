@@ -3,7 +3,11 @@
 {% for field in schema_fields %}
             {% if field.element == 'select' %}
             
-                  {% set options = h.get_faociok_vocabulary_items(field.vocabulary_name, filters=field.vocabulary_filters) or field.options %}
+                  {% set options = h.get_faociok_vocabulary_items(field.vocabulary_name,
+                                                                  filters=field.vocabulary_filters,
+                                                                  order_by=field.vocabulary_order_by)
+
+                                                                     or field.options %}
                   
                   {% set selected = h.get_faociok_field_data(data[field.name], field) %}
 

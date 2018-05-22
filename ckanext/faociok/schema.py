@@ -30,7 +30,8 @@ def _get_package_schema():
           'label': _("M49 Regions"),
           'additional_module': 'm49_regions',
           'vocabulary_name': Vocabulary.VOCABULARY_M49_REGIONS,
-          'vocabulary_filters': [VocabularyTerm._properties.contains('country_code')],
+          'vocabulary_filters': [VocabularyTerm.depth == 1],
+          'vocabulary_order_by': [VocabularyTerm.name],
           'description': _("Regions according to UN M.49 Standard"),
           'is_required': False},
     ]
