@@ -255,7 +255,6 @@ class VocabularyTerm(DeclarativeBase):
         out = []
         for k,v in filters.items():
             attr = getattr(VocabularyTerm, k, None)
-            print('got attr', k, attr)
             if not attr:
                 pass
             out.append(attr == v)
@@ -286,7 +285,6 @@ class VocabularyTerm(DeclarativeBase):
         if limit:
             q = q.limit(limit)
 
-        print(q)
         out = []
         for item in q:
             parent_id = item[0]
