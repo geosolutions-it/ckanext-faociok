@@ -156,14 +156,14 @@ class VocabularyTerm(DeclarativeBase):
         return inst
 
     @classmethod
-    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False):
+    def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, filters=None):
         s = Session
         if not include_dataset_count:
             q = s.query(cls.name, VocabularyLabel.label, cls.depth, cls.id).join(Vocabulary)\
                                                         .outerjoin(VocabularyLabel)\
                                                         .filter(Vocabulary.name==vocabulary_name,
                                                                 VocabularyLabel.lang==lang)\
-                                                        .order_by(cls.path)
+                                                        .order_by(cls.name)
         else:
 
             #value_cond = PackageExtra.value == cls.name
@@ -181,16 +181,19 @@ class VocabularyTerm(DeclarativeBase):
                                                         .filter(Vocabulary.name==vocabulary_name,
                                                                 VocabularyLabel.lang==lang)\
                                                         .group_by(cls.name, VocabularyLabel.label, cls.depth, cls.id)\
-                                                        .order_by(desc('cnt'))
+                                                        .order_by(desc('cnt'), cls.name)
+        if filters:
+            q = q.filter(*filters)
         return q
     
     @classmethod
-    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False):
+    def get_terms(cls, vocabulary_name, lang, include_dataset_count=False, **filters):
         """
         Returns list of terms for vocabulary
         @param vocabulary_name name of vocabulary
         @param lang 2-char lang code
         @param include_dataset_count returns number of active datasets using this term (default: no)
+        @param filters addictional terms query filters_by arguments
 
         @rtype list of items:
                 * term name
@@ -200,7 +203,8 @@ class VocabularyTerm(DeclarativeBase):
                 (optionally, if include_dataset_count flag is set):
                 * dataset_count
         """
-        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count)
+        _filters=cls.make_filters(filters)
+        q = cls.get_terms_q(vocabulary_name, lang, include_dataset_count=include_dataset_count, filters=_filters)
         keys = ('value', 'text', 'depth', 'id',)
         if include_dataset_count:
             keys += ('dataset_count',)
@@ -210,10 +214,32 @@ class VocabularyTerm(DeclarativeBase):
             out['text'] = row[1] or row[0]
             formatted_elements = '-' * out['depth'], ' ' if out['depth'] else '', out['text'],
             out['text_raw'] = out['text']
-            out['text'] = u'{}{}{}'.format(*formatted_elements)
+            #out['text'] = u'{}{}{}'.format(*formatted_elements)
             return out
 
         return [make_row(row) for row in q]
+
+    @classmethod
+    def make_filters(cls, filters):
+        """
+        Translate dictionary of key->value into query.filter(..) values from VocabularyTerm
+        @param filters dictionary of VocabularyTerm columns->values or list of filters
+        """
+        # no filters, bye
+        if not filters:
+            return
+        # anything else than dict, we assume it's already a list of filters
+        if not isinstance(filters, dict):
+            return filters
+        
+        out = []
+        for k,v in filters.items():
+            attr = getattr(VocabularyTerm, k, None)
+            print('got attr', k, attr)
+            if not attr:
+                pass
+            out.append(attr == v)
+        return out
 
 
 class VocabularyLabel(DeclarativeBase):

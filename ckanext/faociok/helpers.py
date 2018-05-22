@@ -22,8 +22,8 @@ def get_fao_m49_region(name):
 def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)
 
-def get_vocabulary_items(vocabulary_name):
-    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang())
+def get_vocabulary_items(vocabulary_name, **filters):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), **filters)
     
 def load_json(value, fail=False):
     try:
@@ -33,8 +33,8 @@ def load_json(value, fail=False):
             raise
         return value
 
-def get_vocabulary_items_annotated(vocabulary_name):
-    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True)
+def get_vocabulary_items_annotated(vocabulary_name, **filters):
+    return VocabularyTerm.get_terms(vocabulary_name, lang=get_lang(), include_dataset_count=True, **filters)
 
 def fao_get_action(action_name, data_dict=None):
     '''BAD BAD WORKAROUND'''
