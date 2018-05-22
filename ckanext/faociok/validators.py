@@ -39,6 +39,8 @@ def _serialize_to_array(value):
 
 def _deserialize_from_array(value):
 
+    if not value:
+        return 
     if not isinstance(value, list):
         try:
             value = json.loads(value)
