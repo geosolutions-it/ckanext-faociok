@@ -60,7 +60,11 @@ class FaoNadaHarvester(NadaHarvester):
 
         # get locations/m49
         ckan_metadata = DdiCkanMetadata()
-        _pkg_dict = ckan_metadata.load(harvest_object.content)
+
+        content = harvest_object.content
+        if isinstance(content, unicode):
+            content = content.encode('utf-8')
+        _pkg_dict = ckan_metadata.load(content)
         
         region_name = _pkg_dict['country']
         region = VocabularyTerm.get_term(Vocabulary.VOCABULARY_M49_REGIONS, region_name).scalar()
