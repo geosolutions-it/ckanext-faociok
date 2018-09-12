@@ -53,9 +53,7 @@ def _serialize_to_array(value):
     return '{{{}}}'.format(serialized)
 
 def _deserialize_from_array(value):
-
-    # we distinct between None and empty list
-    if value is None:
+    if not value:
         return []
     # shorthand for empty array
     elif value == '{}':
