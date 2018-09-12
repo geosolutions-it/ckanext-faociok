@@ -47,6 +47,19 @@ class FaoNadaHarvester(NadaHarvester):
         return context
 
     def import_stage(self, harvest_object):
+        content = harvest_object.content
+        # when xml is unicode and has charset declaration in <?xml.. part
+        # this will raise exception in lxml
+        # ValueError: Unicode strings with encoding declaration are not supported. 
+        #    Please use bytes input or XML fragments without declaration.
+        # that's why we encode to str
+        if isinstance(content, unicode):
+            try:
+                content = content.encode('utf-8')
+            except UnicodeEncodeError:
+                pass
+        harvest_object.content = content
+
         ret = super(FaoNadaHarvester, self).import_stage(harvest_object)
         if not ret:
             return ret
@@ -61,10 +74,7 @@ class FaoNadaHarvester(NadaHarvester):
         # get locations/m49
         ckan_metadata = DdiCkanMetadata()
 
-        content = harvest_object.content
-        if isinstance(content, unicode):
-            content = content.encode('utf-8')
-        _pkg_dict = ckan_metadata.load(content)
+        _pkg_dict = ckan_metadata.load(harvest_object.content)
         
         region_name = _pkg_dict['country']
         region = VocabularyTerm.get_term(Vocabulary.VOCABULARY_M49_REGIONS, region_name).scalar()
