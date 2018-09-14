@@ -79,7 +79,6 @@ class FaoNadaHarvester(NadaHarvester):
         region_name = _pkg_dict.get('country')
         region = None
         if region_name:
-            print('getting region for {}'.format(region_name))
             region = VocabularyTerm.get_term(Vocabulary.VOCABULARY_M49_REGIONS, region_name).first()
             if region:
                 region = region[0]
