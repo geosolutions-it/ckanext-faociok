@@ -76,8 +76,13 @@ class FaoNadaHarvester(NadaHarvester):
 
         _pkg_dict = ckan_metadata.load(harvest_object.content)
         
-        region_name = _pkg_dict['country']
-        region = VocabularyTerm.get_term(Vocabulary.VOCABULARY_M49_REGIONS, region_name).scalar()
+        region_name = _pkg_dict.get('country')
+        region = None
+        if region_name:
+            print('getting region for {}'.format(region_name))
+            region = VocabularyTerm.get_term(Vocabulary.VOCABULARY_M49_REGIONS, region_name).first()
+            if region:
+                region = region[0]
         extras = ret.get('extras') or []
         
         found_in_extras = -1

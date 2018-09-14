@@ -54,11 +54,12 @@ To install ckanext-faociok:
 
      systemctl restart supervisord 
 
-#. Update SOLR schema.xml and add field:
+#. Update SOLR schema.xml and add fields:
 
 .. code::
 
    <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
+   <dynamicField name="sampling_procedure_notes" type="text" multiValued="false" indexed="true" stored="false"/>
    
 #. Restart SOLR
 
