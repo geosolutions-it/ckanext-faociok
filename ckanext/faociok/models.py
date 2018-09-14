@@ -27,6 +27,7 @@ DeclarativeBase = declarative_base(metadata=meta.metadata)
 class Vocabulary(DeclarativeBase):
     VOCABULARY_DATATYPE = 'datatype'
     VOCABULARY_M49_REGIONS = 'm49_regions'
+    VOCABULARY_AGROVOC = 'agrovoc'
 
     __tablename__ = 'faociok_vocabulary'
     id = Column(types.Integer, primary_key=True)
@@ -388,7 +389,22 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
     if term_idx is None:
         raise ValueError(_("Term column not found"))
     
-    for row in rows:
+    no_parent_yet = []
+    def rows_generator():
+        input_row_count = 0
+        for r in rows:
+            input_row_count += 1
+            yield r
+        no_parent_count = 0
+        while no_parent_yet:
+            no_parent_count += 1
+            yield no_parent_yet.pop(0)
+            if len(no_parent_yet) > input_row_count:
+                raise ValueError("no parent count {} above input count: {}".format(no_parent_count,
+                                                                                   input_row_count))
+            if no_parent_count % 100:
+                print('got {} no parent rows'.format(len(no_parent_yet)))
+    for row in rows_generator():
         # all data for row
         _data = dict(zip(headers, row))
         # properties are cells for which header starts with 'property:' prefix
@@ -414,11 +430,15 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
             continue
 
         parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
+        if parent and not parent_from_db:
+            print(_("Postpoining {} term - no {} parent in db yet").format(_data['term'], _data['parent']))
+            no_parent_yet.append(row)
+            continue
+
         # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
         VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
         if not VocabularyTerm.get(vocab, term):
             print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))
-        
         
         counter += 1
     return counter
