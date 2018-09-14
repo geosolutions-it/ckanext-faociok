@@ -96,7 +96,7 @@ class FaoNadaHarvester(NadaHarvester):
                     break
             if found_in_extras > -1:
                 extras.pop(found_in_extras)
-        ret['fao_m49_regions'] = '{{{}}}'.format(region.name)
+        ret['fao_m49_regions'] = '{{{}}}'.format(region.name) if region else '{}'
         ret['fao_datatype'] = 'microdata'
         ret['metadata_modified'] = None
 
