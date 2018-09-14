@@ -91,7 +91,10 @@ class VocabularyCommands(CkanCommand):
                     continue
                 row['lang:{}'.format(label.language)] = label.value
             parent = g.value(subject=o, predicate=SKOS.broader)
-            row['parent'] = str(parent).split('/')[-1]
+            if parent is None:
+                row['parent'] = ''
+            else:
+                row['parent'] = str(parent).split('/')[-1]
             row_data = []
             for col in header:
                 if col.startswith('lang'):
@@ -99,12 +102,18 @@ class VocabularyCommands(CkanCommand):
                 else:
                     val = row[col]
                 row_data.append(val.encode('utf-8') if isinstance(val, unicode) else val)
-            rdata.append(row_data)
+            if row['parent']:
+                rdata.append(row_data)
+            else:
+                # top-level should be first
+                rdata.insert(1, row_data)
+
             
         print('terms in', len(rdata))
         csvdata = StringIO()
         w = csv.writer(csvdata)
         w.writerows(rdata)
+
         csvdata.seek(0)
         with open('{}.csv'.format(in_file), 'w+') as f:
             f.write(csvdata.getvalue())
