@@ -2,11 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import json
-from ckan.common import _, ungettext
+from ckan.common import _, ungettext, config
 from ckan.plugins.toolkit import Invalid
 from ckanext.faociok.models import Vocabulary
+from ckan.lib.navl.dictization_functions import Missing
+
+CONFIG_FAO_DATATYPE = 'ckanext.faociok.datatype'
+
+DEFAULT_DATATYPE = config.get(CONFIG_FAO_DATATYPE)
 
 def fao_datatype(value, context):
+    if not value and DEFAULT_DATATYPE:
+        return DEFAULT_DATATYPE
     try:
         v = Vocabulary.get(Vocabulary.VOCABULARY_DATATYPE)
         if not v.valid_term(value):
@@ -16,31 +23,41 @@ def fao_datatype(value, context):
     
     return value
 
-def fao_m49_regions(value, context):
-    if not value:
-        return
-    value = _deserialize_from_array(value)
-    validated = []
-    try:
-        v = Vocabulary.get(Vocabulary.VOCABULARY_M49_REGIONS)
-        for term in value:
-            if not v.valid_term(term):
-                raise ValueError(_("Term not valid: {}").format(term))
-            validated.append(term)
-    except Exception, err:
-        raise Invalid(_("Invalid m49 regions: {} {}").format(value, err))
-    return validated
+def fao_m49_regions(key, flattened_data, errors, context):
+    # we use extended api to update data dict in-place
+    # this way we avoid various errors in harvesters,
+    # which don't populate extras properly
+    value = flattened_data[key]
+    if isinstance(value, Missing) or value is None:
+        flattened_data[key] = []
+    else:
+        value = _deserialize_from_array(value)
+        validated = []
+        try:
+            v = Vocabulary.get(Vocabulary.VOCABULARY_M49_REGIONS)
+            for term in value:
+                if not v.valid_term(term):
+                    errors.append(ValueError(_("Term not valid: {}").format(term)))
+                    break
+                validated.append(term)
+            flattened_data[key] = validated
+        except Exception, err:
+            errors.append(Invalid(_("Invalid m49 regions: {} {}").format(value, err)))
 
 def _serialize_to_array(value):
+    if isinstance(value, (str, unicode,)) and value.startswith('{') and value.endswith('}'):
+        return value
     if not isinstance(value, (list, tuple, set,)):
         value = [value]
     serialized = ','.join('{}'.format(v) for v in value)
     return '{{{}}}'.format(serialized)
 
 def _deserialize_from_array(value):
-
     if not value:
-        return 
+        return []
+    # shorthand for empty array
+    elif value == '{}':
+        return []
     if not isinstance(value, list):
         try:
             value = json.loads(value)
@@ -51,7 +68,10 @@ def _deserialize_from_array(value):
     # handle {,} notation
     elif isinstance(value, (str, unicode,)):
         if value.startswith('{') and value.endswith('}'):
-            value = value[1:-1].split(',')
+            if not value[1:-1]:
+                value = []
+            else:
+                value = value[1:-1].split(',')
         elif isinstance(value, (str, unicode,)) and value.isdigit():
             value = [value]
         else:
