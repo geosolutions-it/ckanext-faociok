@@ -24,6 +24,19 @@
               </tr>
             {% endfor %}
         
+        {% elif field.name == 'fao_agrovoc' %}
+            {% for term in h.load_json(pkg_dict[field.name] or "{}") %}
+              <tr>
+                <th scope="row" class="dataset-label">{{ _("AGROVOC term")}}</th>
+                <td class="dataset-details">
+                    {{ h.get_fao_agrovoc_term(term) }} [id: {{ term }}]
+                </td>
+              </tr>
+            {% endfor %}
+        
+
+
+
         {% endif %}
       {% endfor %}
 

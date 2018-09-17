@@ -23,6 +23,28 @@ def fao_datatype(value, context):
     
     return value
 
+
+def fao_agrovoc(key, flattened_data, errors, context):
+    # we use extended api to update data dict in-place
+    # this way we avoid various errors in harvesters,
+    # which don't populate extras properly
+    value = flattened_data[key]
+    if isinstance(value, Missing) or value is None:
+        flattened_data[key] = []
+    else:
+        value = _deserialize_from_array(value)
+        validated = []
+        try:
+            v = Vocabulary.get(Vocabulary.VOCABULARY_AGROVOC)
+            for term in value:
+                if not v.valid_term(term):
+                    errors.append(ValueError(_("Term not valid: {}").format(term)))
+                    break
+                validated.append(term)
+            flattened_data[key] = validated
+        except Exception, err:
+            errors.append(Invalid(_("Invalid AGROVOC term: {} {}").format(value, err)))
+
 def fao_m49_regions(key, flattened_data, errors, context):
     # we use extended api to update data dict in-place
     # this way we avoid various errors in harvesters,

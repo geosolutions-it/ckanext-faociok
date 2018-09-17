@@ -24,6 +24,12 @@ def get_fao_m49_region(name):
         return term.get_label(lang).label or term.get_label('en').label
     return name
 
+def get_fao_agrovoc_term(name):
+    lang = get_lang()
+    term = VocabularyTerm.get(Vocabulary.VOCABULARY_AGROVOC, name)
+    if term:
+        return term.get_label(lang).label or term.get_label('en').label
+    return name
 
 def format_term(term, depth):
     return u'{}{}{}'.format('-' * depth, ' ' if depth else '', term)

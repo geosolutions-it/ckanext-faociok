@@ -79,7 +79,7 @@ class VocabularyCommands(CkanCommand):
         g = Graph()
         g.parse(in_file, format='nt')
         rdata = []
-        header = ('parent', 'term', 'lang:en', 'lang:fr', 'lang:de', 'lang:pl', 'lang:it',)
+        header = ('parent', 'term', 'lang:en', 'lang:fr', 'lang:de', 'lang:pl', 'lang:it', 'property:parents',)
         rdata.append(header)
         for o, p, s in g.triples((None, RDF.type, SKOS.Concept)):
             cid = str(o).split('/')[-1]
@@ -90,11 +90,17 @@ class VocabularyCommands(CkanCommand):
                 if not label.language in OFFERED_LANGS:
                     continue
                 row['lang:{}'.format(label.language)] = label.value
-            parent = g.value(subject=o, predicate=SKOS.broader)
-            if parent is None:
-                row['parent'] = ''
-            else:
+
+            iparents = g.triples((o, SKOS.broader, None))
+            parents = []
+            for to in iparents:
+                parent = to[-1]
                 row['parent'] = str(parent).split('/')[-1]
+                parents.append(row['parent'])
+            if not parents:
+                row['parent'] = None
+            row['property:parents'] = ','.join(parents)
+
             row_data = []
             for col in header:
                 if col.startswith('lang'):
@@ -102,21 +108,18 @@ class VocabularyCommands(CkanCommand):
                 else:
                     val = row[col]
                 row_data.append(val.encode('utf-8') if isinstance(val, unicode) else val)
+            
             if row['parent']:
                 rdata.append(row_data)
             else:
                 # top-level should be first
                 rdata.insert(1, row_data)
 
-            
         print('terms in', len(rdata))
         csvdata = StringIO()
         w = csv.writer(csvdata)
         w.writerows(rdata)
 
-        csvdata.seek(0)
-        with open('{}.csv'.format(in_file), 'w+') as f:
-            f.write(csvdata.getvalue())
         csvdata.seek(0)
         voc_name = Vocabulary.VOCABULARY_AGROVOC
         try:
