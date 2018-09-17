@@ -84,26 +84,31 @@ class FaoNadaHarvester(NadaHarvester):
                 region = region[0]
         extras = ret.get('extras') or []
         
+        # microdata don't have any datatype field, so we use predefined one, 'microdata'
+        # in case this is changed in ckan, we should preserve this field in updated dataset
         found_in_extras = -1
         for idx, ex in enumerate(extras):
             if ex['key'] == 'fao_datatype':
                 found_in_extras = idx
                 break
         if found_in_extras > -1:
+            orig_datatype = extras.pop(found_in_extras)
+            ret['fao_datatype'] = orig_datatype['value']
+        else:
+            ret['fao_datatype'] = 'microdata'
+
+        # region can be changed in original dataset, so we need to update this according
+        # to value from incoming data
+        found_in_extras = -1
+        for ex in extras:
+            if ex['key'] == 'fao_m49_regions':
+                found_in_extras = idx
+                break
+        if found_in_extras > -1:
             extras.pop(found_in_extras)
-
-        if region:
-            found_in_extras = -1
-            for ex in extras:
-                if ex['key'] == 'fao_m49_regions':
-                    found_in_extras = idx
-                    break
-            if found_in_extras > -1:
-                extras.pop(found_in_extras)
         ret['fao_m49_regions'] = '{{{}}}'.format(region.name) if region else '{}'
-        ret['fao_datatype'] = 'microdata'
-        ret['metadata_modified'] = None
 
+        ret['metadata_modified'] = None
         out = pupd(self._get_context(), ret)
         
         return ret
