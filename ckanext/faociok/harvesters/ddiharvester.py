@@ -93,7 +93,11 @@ class FaoNadaHarvester(NadaHarvester):
                 break
         if found_in_extras > -1:
             orig_datatype = extras.pop(found_in_extras)
-            ret['fao_datatype'] = orig_datatype['value']
+            # might be Missing instance
+            if isinstance(orig_datatype['value'], (str, unicode,)):
+                ret['fao_datatype'] = orig_datatype['value']
+            else:
+                ret['fao_datatype'] = 'microdata'
         else:
             ret['fao_datatype'] = 'microdata'
 

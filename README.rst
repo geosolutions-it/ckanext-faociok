@@ -59,7 +59,7 @@ To install ckanext-faociok:
 .. code::
 
    <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
-   <dynamicField name="sampling_procedure_notes" type="text" multiValued="false" indexed="true" stored="false"/>
+   <field name="sampling_procedure_notes" type="text" multiValued="false" indexed="true" stored="false"/>
    
 #. Restart SOLR
 
