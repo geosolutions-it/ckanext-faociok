@@ -26,6 +26,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         t.add_template_directory(config_, 'templates')
         t.add_public_directory(config_, 'public')
         t.add_resource('fanstatic', 'faociok')
+        return config_
 
     # IDatasetForm
 
@@ -42,29 +43,30 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     def create_package_schema(self):
         schema = super(FaociokPlugin, self).create_package_schema()
         schema.update(s.get_create_package_schema())
-
-        for k in schema.keys():
-            if k.startswith('fao_'):
-                schema[k] += [t.get_converter('convert_to_extras')]
+        self._update_schema(schema, 'convert_to_extras', before=False)
         return schema
 
     def update_package_schema(self):
         schema = super(FaociokPlugin, self).update_package_schema()
         schema.update(s.get_update_package_schema())
-        
-        for k in schema.keys():
-            if k.startswith('fao_'):
-                schema[k] += [t.get_converter('convert_to_extras')]
-
+        self._update_schema(schema, 'convert_to_extras', before=False)
         return schema
 
     def show_package_schema(self):
         schema = super(FaociokPlugin, self).show_package_schema()
         schema.update(s.get_show_package_schema())
+        self._update_schema(schema, 'convert_from_extras', before=True)
+        return schema
+
+    def _update_schema(self, schema, converter, before=False):
         for k in schema.keys():
             if k.startswith('fao_'):
                 field = schema[k]
-                schema[k] = [t.get_converter('convert_from_extras')] + field
+                if before:
+                    schema[k] = [t.get_converter(converter)] + field
+                else:
+                    schema[k] = field + [t.get_converter(converter)]
+
         return schema
 
     # IValidators
