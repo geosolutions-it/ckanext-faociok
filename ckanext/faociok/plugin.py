@@ -143,6 +143,8 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         return out
 
     def get_localized_agrovoc(self, terms):
+        if not isinstance(terms, list):
+            terms = v._deserialize_from_array(terms)
         out = {'fao_agrovoc': terms}
         for term in terms:
             term = VocabularyTerm.get(Vocabulary.VOCABULARY_AGROVOC, term)
@@ -155,9 +157,9 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
                 except KeyError:
                     out[lname] = set([label.label])
 
-        for k,v in out.items():
-            if isinstance(v, set):
-                out[k] = list(v)
+        for k,val in out.items():
+            if isinstance(val, set):
+                out[k] = list(val)
         return out
 
     def before_index(self, pkg_dict):
@@ -171,7 +173,9 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             localized_datatype = self.get_localized_datatype(pkg_dict['fao_datatype'])
             pkg_dict.update(localized_datatype)
         if pkg_dict.get('fao_agrovoc'):
-            localized_terms = self.get_localized_agrovoc(pkg_dict['fao_agrovoc'])
+            
+            localized_agrovoc = self.get_localized_agrovoc(pkg_dict['fao_agrovoc'])
+            pkg_dict.update(localized_agrovoc)
         return pkg_dict
 
     # IActions
