@@ -9,10 +9,12 @@ import ckan.plugins.toolkit as t
 from ckanext.faociok import schema as s
 from ckanext.faociok import helpers as h
 from ckanext.faociok import validators as v
+from ckanext.faociok import actions as a
 from ckanext.faociok.models import VocabularyTerm, Vocabulary
 
 
 class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
+    plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
@@ -20,7 +22,6 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IActions)
-    plugins.implements(plugins.IRoutes, inherit=True)
 
     # IConfigurer
 
@@ -175,14 +176,13 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
 
     # IActions
     def get_actions(self):
-        return {}
+        return {'fao_autocomplete': a.fao_autocomplete}
 
     # IRoutes
-    def before_map(self, _map):
+    def before_map(self, map):
         controller = 'ckanext.faociok.controllers:FaoAutocompleteController'
-        _map.connect('fao_autocomplete', '/api/util/fao/autocomplete/{_vocabulary}',
-                     controiller=controller,
+        map.connect('fao_autocomplete', '/api/util/fao/autocomplete/{_vocabulary}',
+                     controller=controller,
                      action='fao_autocomplete',
                      requirements={'_vocabulary': 'm49_regions|datatype|agrovoc'})
-
-        return _map
+        return map

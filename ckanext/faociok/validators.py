@@ -78,7 +78,7 @@ def _deserialize_from_array(value):
     if not value:
         return []
     # shorthand for empty array
-    elif value == '{}':
+    elif value == '{}' or value == '':
         return []
     if not isinstance(value, list):
         try:
@@ -97,11 +97,11 @@ def _deserialize_from_array(value):
         elif isinstance(value, (str, unicode,)) and value.isdigit():
             value = [value]
         else:
-            raise Invalid(_("Invalid m49 regions string value: {}").format(value))
+            value = value.split(',')
     # single value from form, not encoded
     elif isinstance(value, int):
         value = [str(value)]
     # everything else is ignored
     else:
-        raise Invalid(_("Invalid m49 regions value: {}").format(value))
+        raise Invalid(_("Invalid list of values: {}").format(value))
     return value

@@ -67,8 +67,23 @@ def most_popular_groups(n):
     return groups
 
 
-def get_field_data(data, field):
-    if field.get('multiple'):
+def get_field_data(data, field, lang=None):
+    if field.get('element') == 'agrovoc':
+        values = v._deserialize_from_array(data)
+        out = []
+        lang = lang or get_lang()
+        for val in values:
+            term = VocabularyTerm.get(Vocabulary.VOCABULARY_AGROVOC, val)
+            if not term:
+                continue
+            label = term.get_label(lang)
+            if not label:
+                label = term.get_label('en')
+            out.append(u'{}|{}'.format(val, label.label))
+        print('out', out)
+        return out
+        
+    elif field.get('multiple'):
         return v._deserialize_from_array(data)
     else:
         return data

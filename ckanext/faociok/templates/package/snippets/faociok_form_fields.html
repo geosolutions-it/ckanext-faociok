@@ -2,22 +2,42 @@
 
 {% for field in schema_fields %}
             {% if field.element == 'select' %}
+                  {% set selected = h.get_faociok_field_data(data[field.name], field) %}
+
                   {% set options = h.get_faociok_vocabulary_items(field.vocabulary_name,
                                                                   filters=field.vocabulary_filters,
                                                                   order_by=field.vocabulary_order_by)
                                    or field.options %}
-                  
-                  {% set selected = h.get_faociok_field_data(data[field.name], field) %}
+                  {% set attrs = {} %}
 
                   {{ dform.select(field.name,
                                   label=field.label,
                                   options=options,
                                   selected=selected,
+                                  attrs=attrs,
                                   error=errors[field.name],
                                   multiple=field.multiple,
-                                  use_autocomplete=field.autocomplete,
+                                  additional_module=field.additional_module,
                                   is_required=field.is_required) }}
 
-            {% endif %}
+            {% elif field.element == 'agrovoc' %}
 
+                  {% set selected = h.get_faociok_field_data(data[field.name], field, lang=h.lang()) %}
+                  {% set options = [] %}
+                  {% set attrs = {'data-module-source': field.vocabulary_url + '?incomplete=?',
+                                  'data-module-key': 'term',
+                                  'data-module-tags': 'false',
+                                  'data-multiple': 'true',
+                                  'data-module-label': 'label'}  %}
+
+                  {{ dform.agrovoc(field.name,
+                                  label=field.label,
+                                  options=data[field.name],
+                                  selected=selected,
+                                  attrs=attrs,
+                                  additional_module=field.additional_module,
+                                  error=errors[field.name],
+                                  multiple=field.multiple,
+                                  is_required=field.is_required) }}
+            {% endif %}
 {% endfor %}
