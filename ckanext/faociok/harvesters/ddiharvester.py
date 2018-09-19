@@ -101,6 +101,22 @@ class FaoNadaHarvester(NadaHarvester):
         else:
             ret['fao_datatype'] = 'microdata'
 
+        # agrovoc is local, so we need to preserve
+        found_in_extras = -1
+        for idx, ex in enumerate(extras):
+            if ex['key'] == 'fao_agrovoc':
+                found_in_extras = idx
+                break
+        if found_in_extras > -1:
+            orig_agrovoc = extras.pop(found_in_extras)
+            # might be Missing instance
+            if isinstance(orig_datatype['value'], (str, unicode,)):
+                ret['fao_agrovoc'] = orig_agrovoc['value']
+            else:
+                ret['fao_agrovoc'] = '{}'
+        else:
+            ret['fao_agrovoc'] = '{}'
+
         # region can be changed in original dataset, so we need to update this according
         # to value from incoming data
         found_in_extras = -1
