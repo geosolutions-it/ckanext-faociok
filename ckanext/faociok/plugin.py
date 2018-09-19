@@ -1,16 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-
+import logging
 import json
-import ckan.plugins as plugins
+
+from ckan import plugins
 from ckan.lib.i18n import get_lang
-import ckan.plugins.toolkit as t
+from ckan.lib.base import config
+from ckan.plugins import toolkit as t
 from ckanext.faociok import schema as s
 from ckanext.faociok import helpers as h
 from ckanext.faociok import validators as v
 from ckanext.faociok.models import VocabularyTerm, Vocabulary
 
+log = logging.getLogger(__name__)
+
+# Configuration switch for trimming long text fields from harvester
+# for solr. see:
+# https://github.com/geosolutions-it/ckanext-faociok/pull/36#issuecomment-422344679
+# alternatively you can declare field in solr schema manually as text (replace $field_name
+# with actual field name):
+#   <field name="$field_name" type="text" multiValued="false" indexed="true" stored="false"/>
+# and set ckanext.faociok.trim_for_index to false. 
+#
+# default - true
+CONFIG_TRIM_FOR_INDEX = 'ckanext.faociok.trim_for_index'
+
+# get config val once
+TRIM_FOR_INDEX = t.asbool(config.get(CONFIG_TRIM_FOR_INDEX, 'true'))
+TRIM_LIMIT = 32 * 1024
+
+# lists of known text type fields - those should not be trimmed, as they are expected to be long
+TRIM_SKIP_FOR_FIELDS = "author author_email child_of dependency_of depends_on derives_from has_derivation linked_from links_to maintainer maintainer_email notes res_description res_name text title urls ckan_url download_url groups license maintainer name notes organization url data_dict validated_data_dict".split(' ')
+TRIM_SKIP_FOR_FIELDS_WILDCHAR = 'extras_ res_extras_ vocab_'.split(' ')
 
 class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
@@ -136,6 +158,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         return out
 
     def before_index(self, pkg_dict):
+        
         regions = pkg_dict.get('fao_m49_regions')
         if regions:
             if not isinstance(regions, list):
@@ -145,4 +168,23 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         if pkg_dict.get('fao_datatype'):
             localized_datatype = self.get_localized_datatype(pkg_dict['fao_datatype'])
             pkg_dict.update(localized_datatype)
+
+        # optional trim values to 32k field size limit 
+        if TRIM_FOR_INDEX:
+            for k, val in pkg_dict.iteritems():
+                # skip known text fields
+                if k in TRIM_SKIP_FOR_FIELDS:
+                    continue
+                for fname in TRIM_SKIP_FOR_FIELDS_WILDCHAR:
+                    if k.startswith(fname):
+                        continue
+                if isinstance(val, basestring):
+                    if len(val) > TRIM_LIMIT:
+                        log.debug('triming %s to 32k: %s', k, val)
+                    pkg_dict[k] = val[:TRIM_LIMIT] if val else val
+                elif isinstance(val, (list, set, tuple,)):
+                    if any([len(item) > TRIM_LIMIT for item in val if isinstance(item, basestring)]):
+                        log.debug('triming %s to 32k: %s', k, val)
+                    pkg_dict[k] = [item[:TRIM_LIMIT] if isinstance(item, basestring) else item for item in val]
+
         return pkg_dict
