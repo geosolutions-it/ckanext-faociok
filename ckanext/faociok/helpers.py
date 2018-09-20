@@ -8,27 +8,32 @@ from ckan.lib.i18n import get_lang
 from ckanext.faociok import validators as v
 from ckan.plugins import toolkit as t
 from ckan.lib import helpers as h
+from ckan.lib.base import config
 from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
+DEFAULT_LANG = config.get('ckan.locale_default')
 
 def get_fao_datatype(name):
     lang = get_lang()
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_DATATYPE, name)
-    return (term.get_label(lang).label or term.name) if term else None
+    label = term.get_label(lang) or term.get_label(DEFAULT_LANG) or term.get_label('en')
+    return (label.label or term.name) if term else None
 
 
 def get_fao_m49_region(name):
     lang = get_lang()
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_M49_REGIONS, name)
     if term:
-        return term.get_label(lang).label or term.get_label('en').label
+        label = term.get_label(lang) or term.get_label(DEFAULT_LANG) or term.get_label('en')
+        return label.label
     return name
 
 def get_fao_agrovoc_term(name):
     lang = get_lang()
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_AGROVOC, name)
     if term:
-        return term.get_label(lang).label or term.get_label('en').label
+        label = term.get_label(lang) or term.get_label(DEFAULT_LANG) or term.get_label('en')
+        return label.label
     return name
 
 def format_term(term, depth):

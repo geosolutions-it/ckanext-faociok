@@ -102,6 +102,10 @@ class VocabularyTerm(DeclarativeBase):
     def properties(self, value):
         self._properties = json.dumps(value)
 
+    def clear_labels(self):
+        Session.query(VocabularyLabel).filter(VocabularyLabel.term_id==self.id).delete()
+        Session.flush()
+
     def set_labels(self, labels):
         for k, v in labels.items():
             VocabularyLabel.create(self, lang=k, label=v)
@@ -160,6 +164,13 @@ class VocabularyTerm(DeclarativeBase):
         Session.add(inst)
         Session.flush()
         return inst
+
+    def update(self, labels=labels, parent=None, properties=None):
+        self.clear_labels()
+        self.set_labels(labels)
+        self.properties = properties or {}
+        Session.add(self)
+        Session.flush()
 
     @classmethod
     def get_term(cls, vocabulary_name, *names):
@@ -443,11 +454,6 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         #    print(_("Skipping row with parent the same as itself: {}".format(_data)))
         #    continue
 
-        term_from_db = VocabularyTerm.get(vocab, term)
-        # print(_("TERM FROM DB ID[{}] DB[{}] ").format(term, term_from_db))
-        if term_from_db:
-            print(_("Skipping existing term: INPUT [{}] DB [{}] ").format(_data, term_from_db))
-            continue
 
         parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
         if parent and not parent_from_db:
@@ -455,10 +461,16 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
             no_parent_yet.append(row)
             continue
 
-        # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
-        VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
-        if not VocabularyTerm.get(vocab, term):
-            print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))
+        term_from_db = VocabularyTerm.get(vocab, term)
+        # print(_("TERM FROM DB ID[{}] DB[{}] ").format(term, term_from_db))
+        if term_from_db:
+            term_from_db.update(labels=labels, parent=parent_from_db, properties=properties)
+            #print(_("Updating existing term: INPUT [{}] DB [{}] ").format(_data, term_from_db))
+        else:
+            # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
+            VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
+            if not VocabularyTerm.get(vocab, term):
+                print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))
         
         counter += 1
     return counter

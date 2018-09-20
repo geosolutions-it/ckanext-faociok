@@ -182,6 +182,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         for k,val in out.items():
             if isinstance(val, set):
                 out[k] = list(val)
+        print('index agrovoc', out)
         return out
 
     def before_index(self, pkg_dict):

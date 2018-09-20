@@ -35,6 +35,8 @@ class FaoAutocompleteController(ApiController):
         resultSet = {
             'ResultSet': {
                 'Result': tag_names,
-                }
+                },
+            'Query': q,
+            'Lang': lang,
         }
         return self._finish_ok(resultSet)

@@ -1,5 +1,5 @@
 {% import 'macros/faociok_form_macros.html' as dform %}
-
+{% set lang = h.lang() %}
 {% for field in schema_fields %}
             {% if field.element == 'select' %}
                   {% set selected = h.get_faociok_field_data(data[field.name], field) %}
@@ -24,7 +24,7 @@
 
                   {% set selected = h.get_faociok_field_data(data[field.name], field, lang=h.lang()) %}
                   {% set options = [] %}
-                  {% set attrs = {'data-module-source': field.vocabulary_url + '?incomplete=?',
+                  {% set attrs = {'data-module-source': field.vocabulary_url + '?lang={}&incomplete=?'.format(lang),
                                   'data-module-key': 'term',
                                   'data-module-tags': 'false',
                                   'data-multiple': 'true',

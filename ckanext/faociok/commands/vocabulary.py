@@ -13,14 +13,13 @@ from rdflib.namespace import SKOS, RDF
 from ckan.common import _, ungettext
 import ckan.plugins.toolkit as toolkit
 
-from ckan.common import config
+from ckan.lib.base import config
 from ckan.lib.cli import CkanCommand
 
 from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary
 
 log = logging.getLogger(__name__)
 
-OFFERED_LANGS = (config.get('ckan.locales_offered') or 'en es fr').lower().split(' ')
 
 class VocabularyCommands(CkanCommand):
     """Manage vocabularies in FAO-CIOK extension.
@@ -75,12 +74,14 @@ class VocabularyCommands(CkanCommand):
 
         syntax: import_agrovoc rdf_file
         """
+        OFFERED_LANGS = (config.get('ckan.locales_offered') or 'en es fr de it').lower().split(' ')
         
+        header = ('parent', 'term',) + tuple(('lang:{}'.format(L) for L in OFFERED_LANGS)) + ( 'property:parents',)
+        rdata = []
+        rdata.append(header)
+
         g = Graph()
         g.parse(in_file, format='nt')
-        rdata = []
-        header = ('parent', 'term', 'lang:en', 'lang:fr', 'lang:de', 'lang:pl', 'lang:it', 'property:parents',)
-        rdata.append(header)
         for o, p, s in g.triples((None, RDF.type, SKOS.Concept)):
             cid = str(o).split('/')[-1]
             row = {'term': cid}
