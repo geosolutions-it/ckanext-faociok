@@ -64,7 +64,13 @@ To install ckanext-faociok:
     unzip agrovoc_2018-09-03_lod.nt.zip
     paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc_2018_09_03_lod.nt  --config=/etc/ckan/default/production.ini
     
-   You can replace timestamp with newer release. Check for newer AGROVOC Releases at http://aims.fao.org/node/121112 and see http://aims.fao.org/vest-registry/vocabularies/agrovoc for general information about accessing AGROVOC.
+.. note:: 
+    
+    You can replace timestamp with newer release. Check for newer AGROVOC Releases at http://aims.fao.org/node/121112 and see http://aims.fao.org/vest-registry/vocabularies/agrovoc for general information about accessing AGROVOC.
+
+
+.. note::
+    Mind that AGROVOC contains lot of data (over 30000 terms and around 500000 translated labels). File parsing and import will take ~10-20 minutes, depending on your hardware.
 
 #. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
