@@ -9,7 +9,7 @@ from ckan.common import _, ungettext
 from ckan.model import Package, PackageExtra, Session
 
 from sqlalchemy import types, Column, ForeignKey, Index, Table
-from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal, inspect
+from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal, inspect, case, desc
 from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
@@ -160,6 +160,26 @@ class VocabularyTerm(DeclarativeBase):
         Session.add(inst)
         Session.flush()
         return inst
+
+    @classmethod
+    def get_term(cls, vocabulary_name, *names):
+        s = Session
+        labels_q = or_(*[VocabularyLabel.label == n for n in names])
+        names_q = or_(*[VocabularyTerm.name == n for n in names])
+        scoring = case(
+                       [
+                        [and_(VocabularyTerm.name.in_(names),
+                             VocabularyLabel.label.in_(names)), 3],
+                        [VocabularyTerm.name.in_(names), 2],
+                        [VocabularyLabel.label.in_(names), 1],
+                       ],
+                      else_=0)
+        score = scoring.label('score')
+        q = s.query(cls, scoring.label('score')).join(Vocabulary, Vocabulary.name==vocabulary_name)\
+                        .outerjoin(VocabularyLabel, VocabularyLabel.term_id==cls.id)\
+                        .filter(or_(labels_q, names_q))\
+                        .order_by(desc(score))
+        return q
 
     @classmethod
     def get_terms_q(cls, vocabulary_name, lang, include_dataset_count=False, is_multiple=False, filters=None, order_by=None):
