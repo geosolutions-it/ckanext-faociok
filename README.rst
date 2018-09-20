@@ -8,6 +8,7 @@ ckanext-faociok
 - Dataset schema customization and faceting
   - Datatype
   - M49 region indexing
+  - AGROVOC integration
 - Scripts for creating default groups
 
 ------------
@@ -55,6 +56,15 @@ To install ckanext-faociok:
 #. Load the datatypes codelist::
 
      paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
+
+#. Load AGROVOC vocabulary::
+
+    cd files    
+    wget http://agrovoc.uniroma2.it/agrovocReleases/agrovoc_2018-09-03_lod.nt.zip
+    unzip agrovoc_2018-09-03_lod.nt.zip
+    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc_2018_09_03_lod.nt  --config=/etc/ckan/default/production.ini
+    
+   You can replace timestamp with newer release. Check for newer AGROVOC Releases at http://aims.fao.org/node/121112 and see http://aims.fao.org/vest-registry/vocabularies/agrovoc for general information about accessing AGROVOC.
 
 #. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
