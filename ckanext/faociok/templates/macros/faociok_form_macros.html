@@ -24,7 +24,14 @@
 
   {%- set extra_html = caller() if caller -%}
   {% call input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
-      <select class="select" placeholder="{{ placeholder }}" name="{{ name }}" {{ attributes(attrs) }} {% if multiple %}multiple{% endif %} {% if additional_module %}data-module="{{ additional_module }}"{% endif %}>
+      <select
+       class="select"
+       placeholder="{{ placeholder }}"
+       name="{{ name }}"
+       {{ attributes(attrs) }}
+       {% if multiple %}multiple{% endif %}
+       {% if additional_module %}data-module="{{ additional_module }}"{% endif %}
+       >
       {% for option in options %}
         {% if multiple %}
             {% set is_selected = option.value in selected if selected is sequence else option.value == selected %}
@@ -44,11 +51,21 @@
 
   {% set classes = (classes|list) %}
   {% do classes.append('control-select') %}
-
   {%- set extra_html = caller() if caller -%}
+
   {% call input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
 
-      <input class="input" placeholder="{{ placeholder }}" name="{{ name }}" {{ attributes(attrs) }} {% if multiple %}multiple="true"{% endif %} {% if additional_module %}data-module="{{ additional_module }}"{% endif %} data-value="{{ ','.join(selected or []) }}" value="{{ ','.join( options ) }}"/>
+      <input
+             type="text"
+             class="select"
+             placeholder="{{ placeholder }}"
+             name="{{ name }}"
+             style="width: 100%"
+             {{ attributes(attrs) }}
+             {% if multiple %}multiple="true"{% endif %}
+             {% if additional_module %}data-module="{{ additional_module }}"{% endif %}
+             data-value="{{ ','.join(selected or []) }}"
+             value="{{ ','.join( options ) }}"/>
     
   {% endcall %}
 
