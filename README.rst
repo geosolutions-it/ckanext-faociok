@@ -57,12 +57,14 @@ To install ckanext-faociok:
 
      paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
 
-#. Load AGROVOC vocabulary::
+#. Load AGROVOC vocabulary. Important note: `clean_agrovoc.sh` script is used to clean agrovoc file from unused triplets, so amount of data to parse is lower. Without it, ingestion script would use far more memory and time to process rdf file.::
 
     cd files    
     wget http://agrovoc.uniroma2.it/agrovocReleases/agrovoc_2018-09-03_lod.nt.zip
     unzip agrovoc_2018-09-03_lod.nt.zip
-    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc_2018_09_03_lod.nt  --config=/etc/ckan/default/production.ini
+    mv agrovoc_2018-09-03_lod.nt agrovoc.nt
+    bash clean_agrovoc.sh agrovoc.nt
+    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc.clean.nt  --config=/etc/ckan/default/production.ini
     
 .. note:: 
     

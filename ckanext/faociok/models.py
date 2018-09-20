@@ -8,7 +8,7 @@ import csv
 from ckan.common import _, ungettext
 from ckan.model import Package, PackageExtra, Session
 
-from sqlalchemy import types, Column, ForeignKey, Index, Table
+from sqlalchemy import types, Column, ForeignKey, Index, Table, select
 from sqlalchemy import orm, and_, or_, desc, distinct, func, cast, literal, inspect, case, desc
 from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -59,18 +59,16 @@ class Vocabulary(DeclarativeBase):
         return inst
 
     def clear(self):
-        q = Session.query(VocabularyLabel)\
-                   .join(VocabularyTerm)\
-                   .filter(VocabularyTerm.vocabulary_id==self.id)
+        sq = Session.query(VocabularyTerm.id).filter(VocabularyTerm.vocabulary_id==self.id)
+        Session.query(VocabularyLabel)\
+                   .filter(VocabularyLabel.term_id.in_(sq.subquery())).delete(synchronize_session=False)
 
-        for vl in q:
-            Session.delete(vl)
+        #for vl in q:
+        #    Session.delete(vl)
+        sq.delete()
 
-        q = Session.query(VocabularyTerm)\
-                   .filter(VocabularyTerm.vocabulary_id==self.id)
-
-        for vl in q:
-            Session.delete(vl)
+        #for vl in q:
+        #    Session.delete(vl)
         Session.flush()
 
 
