@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -x
-set -h
-
 AV_FILE="${1}"
 DEST_FILE="${AV_FILE}.clean.nt"
 

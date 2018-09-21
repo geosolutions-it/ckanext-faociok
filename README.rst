@@ -78,7 +78,7 @@ To install ckanext-faociok:
 
 .. note::
 
-    You should be able to update AGROVOC vocabulary by using new version of RDF (mind that it should be in .nt format) from provided URLs.
+    You should be able to update AGROVOC vocabulary just by providing to the script new version of RDF (mind that it should be in .nt format) from provided URLs.
     Internally, each ingestion invocation removes existing terms and replaces with full set of new ones. This is processed within one transaction in database, so there should be no side-effects in running application (except for small slowdown for time of parsing and inserting new terms).
 
 .. note::
