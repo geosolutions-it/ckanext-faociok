@@ -401,13 +401,13 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
     idx = 0   
     for header in headers:
         if header == "parent":
-            print(_("Parent column found at idx {}").format(idx))
+            log.info(_("Parent column found at idx %s"), idx)
             parent_idx = idx
         elif header == "term":
-            print(_("Term column found at idx {}").format(idx))
+            log.info(_("Term column found at idx %s"), idx)
             term_idx = idx
         elif not header.startswith('lang:') and not header.startswith('property:'):
-            print(_("Column {} will not be stored").format(header))
+            log.info(_("Column %s will not be stored"), header)
         idx = idx + 1
 
     # establish if we have a parent
@@ -431,8 +431,8 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
             if len(no_parent_yet) > input_row_count:
                 raise ValueError("no parent count {} above input count: {}".format(no_parent_count,
                                                                                    input_row_count))
-            if no_parent_count % 100:
-                print('got {} no parent rows'.format(len(no_parent_yet)))
+            #if no_parent_count % 100:
+            #    print('got {} no parent rows'.format(len(no_parent_yet)))
     for row in rows_generator():
         # all data for row
         _data = dict(zip(headers, row))
@@ -445,7 +445,7 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         parent = row[parent_idx] if parent_idx is not None else None
 
         if not term:
-            print(_("Skipping row with no term: {}").format(_data))
+            # print(_("Skipping row with no term: {}").format(_data))
             continue
         
         #if parent and parent == term:
@@ -455,7 +455,7 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
 
         parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
         if parent and not parent_from_db:
-            print(_("Postpoining {} term - no {} parent in db yet").format(_data['term'], _data['parent']))
+            log.info(_("Postpoining %s term - no %s parent in db yet"), _data['term'], _data['parent'])
             no_parent_yet.append(row)
             continue
 
@@ -468,7 +468,7 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
             # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
             VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
             if not VocabularyTerm.get(vocab, term):
-                print(_("ERROR: TERM NOT CREATED  vocab[{}] term[{}] data[{}]").format(vocab, term, _data))
+                log.error(_("ERROR: TERM NOT CREATED  vocab[%s] term[%s] data[%s]"), vocab, term, _data)
         
         counter += 1
     return counter

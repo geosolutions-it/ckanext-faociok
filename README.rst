@@ -25,6 +25,7 @@ Provides
 * `faociok` - Theme customization, schema fields:
     * `fao_datatype` describes area of interest of data
     * `fao_m49_region` normalized statistical regions from UN M.49 vocabulary
+    * `fao_agrovoc` normalized terms for agriculture from FAO
 * `faociok_nada_harvester` - NADA/DDI harvester which handles additional FAO schema fields.
 
 ------------
@@ -72,7 +73,17 @@ To install ckanext-faociok:
 
 
 .. note::
+
     Mind that AGROVOC contains lot of data (over 30000 terms and around 500000 translated labels). File parsing and import will take ~10-20 minutes, depending on your hardware.
+
+.. note::
+
+    You should be able to update AGROVOC vocabulary by using new version of RDF (mind that it should be in .nt format) from provided URLs.
+    Internally, each ingestion invocation removes existing terms and replaces with full set of new ones. This is processed within one transaction in database, so there should be no side-effects in running application (except for small slowdown for time of parsing and inserting new terms).
+
+.. note::
+    
+    After ingesting new version of AGROVOC, you should run Solr reindexing. This is because indexed data don't refer to labels directly, they use local copy from the moment of idexation. This can lead to problems like displaying outdated term names in facets. Reindexation will refresh that data. 
 
 #. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
@@ -82,11 +93,13 @@ To install ckanext-faociok:
 
      systemctl restart supervisord 
 
-#. Update SOLR `schema.xml` and add field:
+#. Update SOLR `schema.xml` and add fields:
 
 .. code::
 
    <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
+   <dynamicField name="fao_agrovoc*" type="string" multiValued="true" indexed="true" stored="false"/>
+
    
 #. Restart SOLR
 

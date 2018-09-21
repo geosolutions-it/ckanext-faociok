@@ -116,7 +116,7 @@ class VocabularyCommands(CkanCommand):
                 # top-level should be first
                 rdata.insert(1, row_data)
 
-        print('terms in', len(rdata))
+        log.info('AGROVOC terms in: %s', len(rdata))
         csvdata = StringIO()
         w = csv.writer(csvdata)
         w.writerows(rdata)
