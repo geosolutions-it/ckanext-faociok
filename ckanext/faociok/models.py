@@ -14,7 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError as SAError
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 from ckan.lib.base import config
-from ckan.model import Session, Tag, Vocabulary
+from ckan.model import Session, Tag, Vocabulary, Package, PackageExtra
 from ckan.model import meta, repo
 
 
@@ -184,7 +184,9 @@ class VocabularyTerm(DeclarativeBase):
                        ],
                       else_=0)
         score = scoring.label('score')
-        q = s.query(cls, scoring.label('score')).join(Vocabulary, Vocabulary.name==vocabulary_name)\
+        q = s.query(cls, scoring.label('score')).join(Vocabulary, and_(
+                                                       cls.vocabulary_id==Vocabulary.id,
+                                                       Vocabulary.name==vocabulary_name))\
                         .outerjoin(VocabularyLabel, VocabularyLabel.term_id==cls.id)\
                         .filter(or_(labels_q, names_q))\
                         .order_by(desc(score))
@@ -353,6 +355,47 @@ def setup_models():
         if not t.exists():
             t.create()
 
+def find_unused_terms(vocabulary_name, field_name):
+    """
+    Find unused terms for specific vocabulary. Assumption is terms
+    are in package's extras under provided field_name, and are stored
+    as an array ({item1,item2} notation).
+
+    This will unpack all terms and verify if any of them doesn't have 
+    accompanying VocabularyTerm.
+
+    Return is a dictionary with keys:
+     * datasets - list of datasets with vocabulary
+       terms that are not used by any term
+     * list of terms unused
+    """
+    from ckanext.faociok.validators import _deserialize_from_array, _serialize_to_array
+    datasets = {}
+    bad_terms = {}
+    out = {'datasets': datasets,
+           'terms': bad_terms}
+
+    extras = Session.query(PackageExtra).filter(PackageExtra.state=='active',
+                                                PackageExtra.key==field_name)\
+                                        .join(Package, and_(Package.id==PackageExtra.package_id,
+                                                            Package.type=='dataset',
+                                                            Package.state=='active'))
+    for ex in extras:
+        keys = _deserialize_from_array(ex.value)
+        new_keys = []
+        for k in keys:
+            term = VocabularyTerm.get(vocabulary_name, k)
+            if not term:
+                try:
+                    datasets[ex.package_id].add(k)
+                except KeyError:
+                    datasets[ex.package_id] = set([k])
+                try:
+                    bad_terms[k].add(ex.package_id)
+                except KeyError:
+                    bad_terms[k] = set([ex.package_id])
+    return out
+
 def load_vocabulary(vocabulary_name, fh, **vocab_config):
     """
     Load Vocabulary terms and lang values
@@ -388,7 +431,7 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
     except ValueError:
         vocab = Vocabulary.create(vocabulary_name, **vocab_config)
     
-    print(_("Using Vocabulary{}").format(vocab))
+    print(_("Using {}").format(vocab))
 
     rows = csv.reader(fh)
     counter = 0
@@ -419,20 +462,22 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         raise ValueError(_("Term column not found"))
     
     no_parent_yet = []
+    input_finished = False
+
     def rows_generator():
         input_row_count = 0
+        no_parent_count = 0
         for r in rows:
             input_row_count += 1
             yield r
-        no_parent_count = 0
+        input_finished = True
         while no_parent_yet:
             no_parent_count += 1
             yield no_parent_yet.pop(0)
             if len(no_parent_yet) > input_row_count:
                 raise ValueError("no parent count {} above input count: {}".format(no_parent_count,
                                                                                    input_row_count))
-            #if no_parent_count % 100:
-            #    print('got {} no parent rows'.format(len(no_parent_yet)))
+
     for row in rows_generator():
         # all data for row
         _data = dict(zip(headers, row))
@@ -447,11 +492,6 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
         if not term:
             # print(_("Skipping row with no term: {}").format(_data))
             continue
-        
-        #if parent and parent == term:
-        #    print(_("Skipping row with parent the same as itself: {}".format(_data)))
-        #    continue
-
 
         parent_from_db = VocabularyTerm.get(vocab, parent) if parent else None
         if parent and not parent_from_db:
@@ -460,15 +500,21 @@ def load_vocabulary(vocabulary_name, fh, **vocab_config):
             continue
 
         term_from_db = VocabularyTerm.get(vocab, term)
-        # print(_("TERM FROM DB ID[{}] DB[{}] ").format(term, term_from_db))
         if term_from_db:
             term_from_db.update(labels=labels, parent=parent_from_db, properties=properties)
-            #print(_("Updating existing term: INPUT [{}] DB [{}] ").format(_data, term_from_db))
         else:
-            # print(_("Term [{}] has PARENT [{}] [{}] ").format(term, parent, parent_from_db))
             VocabularyTerm.create(vocab, term, labels, parent=parent_from_db, properties=properties)
             if not VocabularyTerm.get(vocab, term):
                 log.error(_("ERROR: TERM NOT CREATED  vocab[%s] term[%s] data[%s]"), vocab, term, _data)
         
         counter += 1
+        if counter % 1000 == 0:
+            # csv.reader doesn't know how much rows it has, so we have to use
+            # input_finished flag which is populated from generator
+            if input_finished:
+                print('Processed {} items, {} to go'.format(counter, len(no_parent_yet)))
+            else:
+                print('Processed {} items'.format(counter))
+
+
     return counter

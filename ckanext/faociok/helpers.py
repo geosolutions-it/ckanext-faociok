@@ -78,13 +78,16 @@ def get_field_data(data, field, lang=None):
         out = []
         lang = lang or get_lang()
         for val in values:
+            if not val:
+                continue
             term = VocabularyTerm.get(Vocabulary.VOCABULARY_AGROVOC, val)
             if not term:
+                out.append(u'{}|{}'.format(val, val))
                 continue
             label = term.get_label(lang)
             if not label:
-                label = term.get_label('en')
-            out.append(u'{}|{}'.format(val, label.label))
+                label = term.get_label('en') 
+            out.append(u'{}|{}'.format(val, label.label or val))
         print('out', out)
         return out
         

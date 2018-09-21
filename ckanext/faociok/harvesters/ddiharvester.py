@@ -83,7 +83,7 @@ class FaoNadaHarvester(NadaHarvester):
             if region:
                 region = region[0]
         extras = ret.get('extras') or []
-        
+
         # microdata don't have any datatype field, so we use predefined one, 'microdata'
         # in case this is changed in ckan, we should preserve this field in updated dataset
         found_in_extras = -1
@@ -92,7 +92,7 @@ class FaoNadaHarvester(NadaHarvester):
                 found_in_extras = idx
                 break
         if found_in_extras > -1:
-            orig_datatype = extras.pop(found_in_extras)
+            orig_datatype = extras[found_in_extras]
             # might be Missing instance
             if isinstance(orig_datatype['value'], (str, unicode,)):
                 ret['fao_datatype'] = orig_datatype['value']
@@ -108,7 +108,7 @@ class FaoNadaHarvester(NadaHarvester):
                 found_in_extras = idx
                 break
         if found_in_extras > -1:
-            orig_agrovoc = extras.pop(found_in_extras)
+            orig_agrovoc = extras[found_in_extras]
             # might be Missing instance
             if isinstance(orig_datatype['value'], (str, unicode,)):
                 ret['fao_agrovoc'] = orig_agrovoc['value']
@@ -116,18 +116,11 @@ class FaoNadaHarvester(NadaHarvester):
                 ret['fao_agrovoc'] = '{}'
         else:
             ret['fao_agrovoc'] = '{}'
+        
+        # remove duplicated extras
+        ret['extras'] = [ex for ex in extras if not ex['key'].startswith('fao_')]
 
-        # region can be changed in original dataset, so we need to update this according
-        # to value from incoming data
-        found_in_extras = -1
-        for ex in extras:
-            if ex['key'] == 'fao_m49_regions':
-                found_in_extras = idx
-                break
-        if found_in_extras > -1:
-            extras.pop(found_in_extras)
         ret['fao_m49_regions'] = '{{{}}}'.format(region.name) if region else '{}'
-
         ret['metadata_modified'] = None
         out = pupd(self._get_context(), ret)
         

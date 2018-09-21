@@ -16,7 +16,7 @@ import ckan.plugins.toolkit as toolkit
 from ckan.lib.base import config
 from ckan.lib.cli import CkanCommand
 
-from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary, find_unused_terms
 
 log = logging.getLogger(__name__)
 
@@ -116,7 +116,7 @@ class VocabularyCommands(CkanCommand):
                 # top-level should be first
                 rdata.insert(1, row_data)
 
-        log.info('AGROVOC terms in: %s', len(rdata))
+        log.info('AGROVOC terms parsed: %s', len(rdata))
         csvdata = StringIO()
         w = csv.writer(csvdata)
         w.writerows(rdata)
@@ -129,7 +129,12 @@ class VocabularyCommands(CkanCommand):
             voc = Vocabulary.create(voc_name, has_relations=True)
 
         count = load_vocabulary(voc_name, csvdata)
-
+        log.info('AGROVOC terms imported: %s', count)
+        cleanup_stats = find_unused_terms(voc_name, 'fao_agrovoc')
+        if cleanup_stats['datasets']:
+            print("Following dataset have terms not present in vocabulary:")
+            for dname, tvals in sorted(cleanup_stats['datasets'].items()):
+                print(' dataset', dname,':', ','.join(tvals))
 
     def cmd_import_m49(self, in_file, *args, **kwargs):
         """
