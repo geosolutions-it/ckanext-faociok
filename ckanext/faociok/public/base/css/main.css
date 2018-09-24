@@ -8572,6 +8572,7 @@ h4 small {
 .masthead .navigation .nav-pills li a:hover,
 .masthead .navigation .nav-pills li.active a {
   background-color: #094e7d;
+  color: #fff;
 }
 .masthead .nav > li > a,
 .masthead .nav > li > a:focus,
@@ -8579,7 +8580,7 @@ h4 small {
 .masthead .nav > .active > a,
 .masthead .nav > .active > a:hover,
 .masthead .nav > .active > a:focus {
-  color: #fff;
+  color: #0d6cac;
   text-shadow: none;
 }
 .masthead .site-search {
@@ -8657,9 +8658,15 @@ h4 small {
   .masthead .container {
     padding-left: 20px;
     padding-right: 20px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .masthead .site-search {
     display: none;
+  }
+
+  .masthead .container .language-header-container {
+    margin-top: 12px;
   }
 }
 .site-footer {
@@ -10775,3 +10782,33 @@ h5 {
   font-weight: bold;
 }
 /* end home page */
+
+.masthead.navbar-static-top {
+  color: #333;
+  background-color: #eeeeee;
+}
+
+.masthead.navbar-logo {
+  color: #fff;
+  background: #0d6cac;
+  padding: 8px;
+}
+
+.language-header-container > .lang-select {
+  margin: 4px 0;
+}
+
+.language-header-container > .lang-select .select2-container .select2-choice {
+  border-color: transparent;
+}
+.language-header-container > .lang-select label {
+  margin: 0;
+  padding-top: 4px;
+  padding-right: 16px;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.select2-drop {
+  border-color: transparent;
+}
