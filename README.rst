@@ -34,41 +34,38 @@ Installation
 
 To install ckanext-faociok:
 
-#. Activate your CKAN virtual environment, for example::
+1. Activate your CKAN virtual environment, for example::
 
      . /usr/lib/ckan/default/bin/activate
 
-#. Install the ckanext-faociok Python package into your virtual environment::
+2. Install the ckanext-faociok Python package into your virtual environment::
 
      pip install ckanext-faociok
 
-#. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
+3. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
-#. Update the DB using the ``initdb`` command::
+4. Update the DB using the ``initdb`` command::
  
      paster --plugin=ckanext-faociok faociok initdb --config=/etc/ckan/default/production.ini
      
-#. Load the M49 vocabulary::
+5. Load the M49 vocabulary::
 
      paster --plugin=ckanext-faociok vocabulary import_m49 files/M49_Codes.xlsx --config=/etc/ckan/default/production.ini
 
-#. Load the datatypes codelist::
+6. Load the datatypes codelist::
 
      paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
 
-#. Load AGROVOC vocabulary. Important note: `clean_agrovoc.sh` script is used to clean agrovoc file from unused triplets, so amount of data to parse is lower. Without it, ingestion script would use far more memory and time to process rdf file.::
+7. Load AGROVOC vocabulary. Important note: `clean_agrovoc.sh` script is used to clean agrovoc file from unused triplets, so amount of data to parse is lower. Without it, ingestion script would use far more memory and time to process rdf file::
 
-    cd files    
+    cd ckanext-faociok/files    
     wget http://agrovoc.uniroma2.it/agrovocReleases/agrovoc_2018-09-03_lod.nt.zip
     unzip agrovoc_2018-09-03_lod.nt.zip
-    mv agrovoc_2018-09-03_lod.nt agrovoc.nt
-    bash clean_agrovoc.sh agrovoc.nt
-    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc.clean.nt  --config=/etc/ckan/default/production.ini
+    bash clean_agrovoc.sh agrovoc_2018-09-03_lod.nt
+    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc_2018-09-03_lod.nt --config=/etc/ckan/default/production.ini
 
-
-    
 .. note:: 
     
     You can replace timestamp with newer release. Check for newer AGROVOC Releases at http://aims.fao.org/node/121112 and see http://aims.fao.org/vest-registry/vocabularies/agrovoc for general information about accessing AGROVOC.
@@ -79,15 +76,29 @@ To install ckanext-faociok:
     Internally, each ingestion invocation removes existing terms and replaces with full set of new ones. This is processed within one transaction in database, so there should be no side-effects in running application (except for small slowdown for time of parsing and inserting new terms).
 
     After ingesting new version of AGROVOC, you should run Solr reindexing. This is because indexed data don't refer to labels directly, they use local copy from the moment of idexation. This can lead to problems like displaying outdated term names in facets. Reindexation will refresh that data. 
+    
+8. Update SOLR `schema.xml` and add fields:
 
-#. Reindex data in solr (optional, if you're upgrading AGROVOC):
+.. code::
+
+   <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
+   <dynamicField name="fao_agrovoc*" type="string" multiValued="true" indexed="true" stored="false"/>
+   
+9. Restart SOLR
+
+.. code::
+
+    cd /solr/bin/dir
+    ./solr restart -p SOLR_PORT
+
+10. Reindex data in solr (optional, if you're upgrading AGROVOC):
 
 .. code::
 
     paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
 
 
-#. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+9. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
 
@@ -95,20 +106,6 @@ To install ckanext-faociok:
 
      systemctl restart supervisord 
 
-#. Update SOLR `schema.xml` and add fields:
-
-.. code::
-
-   <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
-   <dynamicField name="fao_agrovoc*" type="string" multiValued="true" indexed="true" stored="false"/>
-
-   
-#. Restart SOLR
-
-.. code::
-
-    cd /solr/bin/dir
-    ./solr restart -p SOLR_PORT
 
 -------------
 DDI Harvester
