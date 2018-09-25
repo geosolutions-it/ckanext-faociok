@@ -98,7 +98,7 @@ To install ckanext-faociok:
     paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
 
 
-9. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+11. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
 
