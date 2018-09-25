@@ -160,7 +160,7 @@ Configuration
 Deployment notes
 ----------------
 
-When using FAO/NADA harvester, some ddi-specific fields in dataset may be large (especially `sampling_procedure_notes`). This is rather unfrequent situation, but it may cause error during indexation in Solr. CKAN tries to put all fields from dataset into index, including extra fields, so those fields also qualify. However, default field type is string, which can hold up to 32k of text. See `Solr Fields Ref, StrField <https://lucene.apache.org/solr/guide/6_6/field-types-included-with-solr.html>`. This can cause exceptions during indexing. We suggest two approaches to manage this problem:
+When using FAO/NADA harvester, some ddi-specific fields in dataset may be large (especially `sampling_procedure_notes`). This is rather unfrequent situation, but it may cause error during indexation in Solr. CKAN tries to put all fields from dataset into index, including extra fields, so those fields also qualify. However, default field type is string, which can hold up to 32k of text. See `Solr Fields Ref, StrField <https://lucene.apache.org/solr/guide/6_6/field-types-included-with-solr.html>`. This can cause exceptions during indexing. We suggest two approaches to manage this:
 
  * Trim text fields to 32k char limit.
 
