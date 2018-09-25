@@ -1,0 +1,25 @@
+ {% ckan_extends %} {% block header_account %}
+    {{ super() }}
+    <header class="navbar-static-top masthead navbar-logo">
+        <div class="container">
+            <hgroup class="{{ g.header_class }} pull-left">
+                {% if g.site_logo %}
+                <a class="logo" href="{{ h.url_for('home') }}">
+                    <img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="{{ g.site_title }}" title="{{ g.site_title }}" />
+                </a>
+                {% else %}
+                <h1>
+                    <a href="{{ h.url_for('home') }}">{{ g.site_title }}</a>
+                </h1>
+                {% if g.site_description %}
+                <h2>{{ g.site_description }}</h2>
+                {% endif %} {% endif %}
+            </hgroup>
+            <div class="pull-right language-header-container">{% snippet "snippets/language_selector.html" %}</div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block header_logo %}
+    <span></span>
+{% endblock %}
