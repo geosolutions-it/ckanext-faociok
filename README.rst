@@ -64,7 +64,7 @@ To install ckanext-faociok:
     wget http://agrovoc.uniroma2.it/agrovocReleases/agrovoc_2018-09-03_lod.nt.zip
     unzip agrovoc_2018-09-03_lod.nt.zip
     bash clean_agrovoc.sh agrovoc_2018-09-03_lod.nt
-    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc_2018-09-03_lod.nt --config=/etc/ckan/default/production.ini
+    paster --plugin=ckanext-faociok vocabulary import_agrovoc agrovoc_2018-09-03_lod.nt.clean.nt --config=/etc/ckan/default/production.ini
 
 .. note:: 
     
