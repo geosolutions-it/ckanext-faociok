@@ -11,6 +11,7 @@ from ckan.plugins import toolkit as t
 from ckanext.faociok import schema as s
 from ckanext.faociok import helpers as h
 from ckanext.faociok import validators as v
+from ckanext.faociok import actions as a
 from ckanext.faociok.models import VocabularyTerm, Vocabulary
 
 log = logging.getLogger(__name__)
@@ -35,12 +36,14 @@ TRIM_SKIP_FOR_FIELDS = "author author_email child_of dependency_of depends_on de
 TRIM_SKIP_FOR_FIELDS_WILDCHAR = 'extras_ res_extras_ vocab_'.split(' ')
 
 class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
+    plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IPackageController, inherit=True)
+    plugins.implements(plugins.IActions)
 
     # IConfigurer
 
@@ -99,6 +102,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         return {
             'fao_datatype': v.fao_datatype,
             'fao_m49_regions': v.fao_m49_regions,
+            'fao_agrovoc': v.fao_agrovoc,
         }
 
     # ITemplateHelpers
@@ -111,6 +115,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_faociok_package_schema': s._get_package_schema,
             'get_fao_datatype': h.get_fao_datatype,
             'get_fao_m49_region': h.get_fao_m49_region,
+            'get_fao_agrovoc_term': h.get_fao_agrovoc_term,
             'get_faociok_field_data': h.get_field_data,
             'get_fao_url_for_location': h.get_url_for_location,
             'load_json': h.load_json,
@@ -124,9 +129,11 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     def dataset_facets(self, facets_dict, package_type):
         lang = get_lang()
         facets_dict['fao_datatype_{}'.format(lang)] = t._("Data type")
+        facets_dict['fao_agrovoc_{}'.format(lang)] = t._("AGROVOC terms")
         for idx, l in ((0, t._("Regions"),),
                        (1, t._("Countries"),)):
             facets_dict['fao_m49_regions_l{}_{}'.format(idx, lang)] = l
+            
         return facets_dict
 
     # IPackageController
@@ -157,6 +164,26 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             out[lname] = l.label
         return out
 
+    def get_localized_agrovoc(self, terms):
+        if not isinstance(terms, list):
+            terms = v._deserialize_from_array(terms)
+        out = {'fao_agrovoc': terms}
+        for term in terms:
+            term = VocabularyTerm.get(Vocabulary.VOCABULARY_AGROVOC, term)
+            if not term:
+                continue
+            for label in term.labels:
+                lname = 'fao_agrovoc_{}'.format(label.lang)
+                try:
+                    out[lname].add(label.label)
+                except KeyError:
+                    out[lname] = set([label.label])
+
+        for k,val in out.items():
+            if isinstance(val, set):
+                out[k] = list(val)
+        return out
+
     def before_index(self, pkg_dict):
         
         regions = pkg_dict.get('fao_m49_regions')
@@ -168,6 +195,10 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
         if pkg_dict.get('fao_datatype'):
             localized_datatype = self.get_localized_datatype(pkg_dict['fao_datatype'])
             pkg_dict.update(localized_datatype)
+        if pkg_dict.get('fao_agrovoc'):
+            
+            localized_agrovoc = self.get_localized_agrovoc(pkg_dict['fao_agrovoc'])
+            pkg_dict.update(localized_agrovoc)
 
         # optional trim values to 32k field size limit 
         if TRIM_FOR_INDEX:
@@ -188,3 +219,16 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
                     pkg_dict[k] = [item[:TRIM_LIMIT] if isinstance(item, basestring) else item for item in val]
 
         return pkg_dict
+
+    # IActions
+    def get_actions(self):
+        return {'fao_autocomplete': a.fao_autocomplete}
+
+    # IRoutes
+    def before_map(self, map):
+        controller = 'ckanext.faociok.controllers:FaoAutocompleteController'
+        map.connect('fao_autocomplete', '/api/util/fao/autocomplete/{_vocabulary}',
+                     controller=controller,
+                     action='fao_autocomplete',
+                     requirements={'_vocabulary': 'm49_regions|datatype|agrovoc'})
+        return map

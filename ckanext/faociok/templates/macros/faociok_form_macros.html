@@ -18,13 +18,20 @@
 {% endmacro %}
 
 
-{% macro select(name, id='', label='', options='', selected='', error='', classes=[], attrs={}, is_required=false, help='', multiple=False, use_autocomplete=False, additional_module=None) %}
+{% macro select(name, id='', label='', options='', selected='', error='', classes=[], attrs={}, is_required=false, help='', multiple=False, additional_module=None) %}
   {% set classes = (classes|list) %}
   {% do classes.append('control-select') %}
 
   {%- set extra_html = caller() if caller -%}
   {% call input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
-      <select class="select" placeholder="{{ placeholder }}" name="{{ name }}" {{ attributes(attrs) }} {% if multiple %}multiple{% endif %} {% if use_autocomplete %}data-module="autocomplete"{% endif %} {% if additional_module %}data-module="{{ additional_module }}"{% endif %}>
+      <select
+       class="select"
+       placeholder="{{ placeholder }}"
+       name="{{ name }}"
+       {{ attributes(attrs) }}
+       {% if multiple %}multiple{% endif %}
+       {% if additional_module %}data-module="{{ additional_module }}"{% endif %}
+       >
       {% for option in options %}
         {% if multiple %}
             {% set is_selected = option.value in selected if selected is sequence else option.value == selected %}
@@ -39,3 +46,28 @@
   {% endcall %}
 {% endmacro %}
 
+
+{% macro agrovoc(name, id, label, options='', selected='', error='', classes='', attrs={}, is_required=False, help='', multiple=False, additional_module=None) %}
+
+  {% set classes = (classes|list) %}
+  {% do classes.append('control-select') %}
+  {%- set extra_html = caller() if caller -%}
+
+  {% call input_block(id or name, label or name, error, classes, extra_html=extra_html, is_required=is_required) %}
+
+      <input
+             type="text"
+             class="select"
+             placeholder="{{ placeholder }}"
+             name="{{ name }}"
+             style="width: 100%"
+             {{ attributes(attrs) }}
+             {% if multiple %}multiple="true"{% endif %}
+             {% if additional_module %}data-module="{{ additional_module }}"{% endif %}
+             data-value="{{ ','.join(selected or []) }}"
+             value="{{ ','.join( options ) }}"/>
+    
+  {% endcall %}
+
+
+{% endmacro %}

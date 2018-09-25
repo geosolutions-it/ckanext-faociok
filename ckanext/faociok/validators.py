@@ -23,6 +23,28 @@ def fao_datatype(value, context):
     
     return value
 
+
+def fao_agrovoc(key, flattened_data, errors, context):
+    # we use extended api to update data dict in-place
+    # this way we avoid various errors in harvesters,
+    # which don't populate extras properly
+    value = flattened_data[key]
+    if isinstance(value, Missing) or value is None:
+        flattened_data[key] = []
+    else:
+        value = _deserialize_from_array(value)
+        validated = []
+        try:
+            v = Vocabulary.get(Vocabulary.VOCABULARY_AGROVOC)
+            for term in value:
+                if not v.valid_term(term):
+                    errors.append(ValueError(_("Term not valid: {}").format(term)))
+                    break
+                validated.append(term)
+            flattened_data[key] = validated
+        except Exception, err:
+            errors.append(Invalid(_("Invalid AGROVOC term: {} {}").format(value, err)))
+
 def fao_m49_regions(key, flattened_data, errors, context):
     # we use extended api to update data dict in-place
     # this way we avoid various errors in harvesters,
@@ -56,7 +78,7 @@ def _deserialize_from_array(value):
     if not value:
         return []
     # shorthand for empty array
-    elif value == '{}':
+    elif value == '{}' or value == '':
         return []
     if not isinstance(value, list):
         try:
@@ -75,11 +97,11 @@ def _deserialize_from_array(value):
         elif isinstance(value, (str, unicode,)) and value.isdigit():
             value = [value]
         else:
-            raise Invalid(_("Invalid m49 regions string value: {}").format(value))
+            value = value.split(',')
     # single value from form, not encoded
     elif isinstance(value, int):
         value = [str(value)]
     # everything else is ignored
     else:
-        raise Invalid(_("Invalid m49 regions value: {}").format(value))
+        raise Invalid(_("Invalid list of values: {}").format(value))
     return value

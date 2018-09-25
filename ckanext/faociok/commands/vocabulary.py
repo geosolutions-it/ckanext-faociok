@@ -7,16 +7,19 @@ import traceback
 import csv
 from cStringIO import StringIO
 from openpyxl import load_workbook
+from rdflib import Graph
+from rdflib.namespace import SKOS, RDF
 
 from ckan.common import _, ungettext
 import ckan.plugins.toolkit as toolkit
 
-from pylons import config
+from ckan.lib.base import config
 from ckan.lib.cli import CkanCommand
 
-from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary, find_unused_terms
 
 log = logging.getLogger(__name__)
+
 
 class VocabularyCommands(CkanCommand):
     """Manage vocabularies in FAO-CIOK extension.
@@ -64,6 +67,74 @@ class VocabularyCommands(CkanCommand):
         with open(path, 'rt') as f:
             count = load_vocabulary(vocabulary_name, f)
             print(_('loaded {} terms from {} to {} vocabulary').format(count, path, vocabulary_name))
+
+    def cmd_import_agrovoc(self, in_file, *args, **kwargs):
+        """
+        Import AGROVOC terms from RDF file
+
+        syntax: import_agrovoc rdf_file
+        """
+        OFFERED_LANGS = (config.get('ckan.locales_offered') or 'en es fr de it').lower().split(' ')
+        
+        header = ('parent', 'term',) + tuple(('lang:{}'.format(L) for L in OFFERED_LANGS)) + ( 'property:parents',)
+        rdata = []
+        rdata.append(header)
+
+        g = Graph()
+        g.parse(in_file, format='nt')
+        for o, p, s in g.triples((None, RDF.type, SKOS.Concept)):
+            cid = str(o).split('/')[-1]
+            row = {'term': cid}
+
+            for label_r in g.triples((o, SKOS.prefLabel, None)):
+                label = label_r[2]
+                if not label.language in OFFERED_LANGS:
+                    continue
+                row['lang:{}'.format(label.language)] = label.value
+
+            iparents = g.triples((o, SKOS.broader, None))
+            parents = []
+            for to in iparents:
+                parent = to[-1]
+                row['parent'] = str(parent).split('/')[-1]
+                parents.append(row['parent'])
+            if not parents:
+                row['parent'] = None
+            row['property:parents'] = ','.join(parents)
+
+            row_data = []
+            for col in header:
+                if col.startswith('lang'):
+                    val = row.get(col) or row.get('lang:en') or row.get('lang:fr') 
+                else:
+                    val = row[col]
+                row_data.append(val.encode('utf-8') if isinstance(val, unicode) else val)
+            
+            if row['parent']:
+                rdata.append(row_data)
+            else:
+                # top-level should be first
+                rdata.insert(1, row_data)
+
+        log.info('AGROVOC terms parsed: %s', len(rdata))
+        csvdata = StringIO()
+        w = csv.writer(csvdata)
+        w.writerows(rdata)
+
+        csvdata.seek(0)
+        voc_name = Vocabulary.VOCABULARY_AGROVOC
+        try:
+            voc = Vocabulary.get(voc_name)
+        except ValueError:
+            voc = Vocabulary.create(voc_name, has_relations=True)
+
+        count = load_vocabulary(voc_name, csvdata)
+        log.info('AGROVOC terms imported: %s', count)
+        cleanup_stats = find_unused_terms(voc_name, 'fao_agrovoc')
+        if cleanup_stats['datasets']:
+            print("Following dataset have terms not present in vocabulary:")
+            for dname, tvals in sorted(cleanup_stats['datasets'].items()):
+                print(' dataset', dname,':', ','.join(tvals))
 
     def cmd_import_m49(self, in_file, *args, **kwargs):
         """
@@ -139,7 +210,7 @@ class VocabularyCommands(CkanCommand):
         return dict([ (n[4:], getattr(self, n),) for n in dir(self) if n.startswith('cmd_')])
         
     def command_usage(self, cmd, callable):
-        return '    {}\n     {}\n'.format(cmd, callable.__doc__.strip())
+        return '    {}\n     {}\n'.format(cmd, (callable.__doc__ or 'No documentation yet').strip())
 
     def command(self):
         '''
