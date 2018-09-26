@@ -9,20 +9,18 @@ from ckan.lib.navl.dictization_functions import Missing
 
 CONFIG_FAO_DATATYPE = 'ckanext.faociok.datatype'
 
-DEFAULT_DATATYPE = config.get(CONFIG_FAO_DATATYPE)
 
 def fao_datatype(value, context):
+    DEFAULT_DATATYPE = config.get(CONFIG_FAO_DATATYPE)
     if not value and DEFAULT_DATATYPE:
         return DEFAULT_DATATYPE
     try:
         v = Vocabulary.get(Vocabulary.VOCABULARY_DATATYPE)
         if not v.valid_term(value):
             raise ValueError(_("Term not valid"))
+        return value
     except Exception, err:
         raise Invalid(_("Invalid datatype value: {}: {}").format(value, err))
-    
-    return value
-
 
 def fao_agrovoc(key, flattened_data, errors, context):
     # we use extended api to update data dict in-place

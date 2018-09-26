@@ -1,0 +1,100 @@
+<http://aims.fao.org/aos/agrovoc/c_4788> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_2208> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_433> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_3965> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_27596> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_432> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_25746> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_1375> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_6075> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_7020> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_14228> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_15980> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_25756> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_26813> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_29461> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_32674> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_35112> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_36922> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_638> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_6961> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#Concept> .
+<http://aims.fao.org/aos/agrovoc/c_4788> <http://www.w3.org/2004/02/skos/core#prefLabel> "Methode"@de .
+<http://aims.fao.org/aos/agrovoc/c_4788> <http://www.w3.org/2004/02/skos/core#prefLabel> "methods"@en .
+<http://aims.fao.org/aos/agrovoc/c_4788> <http://www.w3.org/2004/02/skos/core#prefLabel> "M\u00E9todos"@es .
+<http://aims.fao.org/aos/agrovoc/c_4788> <http://www.w3.org/2004/02/skos/core#prefLabel> "M\u00E9thode"@fr .
+<http://aims.fao.org/aos/agrovoc/c_2208> <http://www.w3.org/2004/02/skos/core#prefLabel> "Entwurf"@de .
+<http://aims.fao.org/aos/agrovoc/c_2208> <http://www.w3.org/2004/02/skos/core#prefLabel> "design"@en .
+<http://aims.fao.org/aos/agrovoc/c_2208> <http://www.w3.org/2004/02/skos/core#prefLabel> "Dise\u00F1o"@es .
+<http://aims.fao.org/aos/agrovoc/c_2208> <http://www.w3.org/2004/02/skos/core#prefLabel> "Conception"@fr .
+<http://aims.fao.org/aos/agrovoc/c_433> <http://www.w3.org/2004/02/skos/core#prefLabel> "Tierhaltungsmethode"@de .
+<http://aims.fao.org/aos/agrovoc/c_433> <http://www.w3.org/2004/02/skos/core#prefLabel> "animal husbandry methods"@en .
+<http://aims.fao.org/aos/agrovoc/c_433> <http://www.w3.org/2004/02/skos/core#prefLabel> "M\u00E9todos de crianza"@es .
+<http://aims.fao.org/aos/agrovoc/c_433> <http://www.w3.org/2004/02/skos/core#prefLabel> "M\u00E9thode d'\u00E9levage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_3965> <http://www.w3.org/2004/02/skos/core#prefLabel> "Isolierungsverfahren"@de .
+<http://aims.fao.org/aos/agrovoc/c_3965> <http://www.w3.org/2004/02/skos/core#prefLabel> "isolation techniques"@en .
+<http://aims.fao.org/aos/agrovoc/c_3965> <http://www.w3.org/2004/02/skos/core#prefLabel> "T\u00E9cnicas de aislamiento"@es .
+<http://aims.fao.org/aos/agrovoc/c_3965> <http://www.w3.org/2004/02/skos/core#prefLabel> "Technique de l'isolement"@fr .
+<http://aims.fao.org/aos/agrovoc/c_27596> <http://www.w3.org/2004/02/skos/core#prefLabel> "Fortpflanzungskontrolle"@de .
+<http://aims.fao.org/aos/agrovoc/c_27596> <http://www.w3.org/2004/02/skos/core#prefLabel> "reproduction control"@en .
+<http://aims.fao.org/aos/agrovoc/c_27596> <http://www.w3.org/2004/02/skos/core#prefLabel> "Reproducci\u00F3n dirigida"@es .
+<http://aims.fao.org/aos/agrovoc/c_27596> <http://www.w3.org/2004/02/skos/core#prefLabel> "Ma\u00EEtrise de la reproduction"@fr .
+<http://aims.fao.org/aos/agrovoc/c_432> <http://www.w3.org/2004/02/skos/core#prefLabel> "Stallung"@de .
+<http://aims.fao.org/aos/agrovoc/c_432> <http://www.w3.org/2004/02/skos/core#prefLabel> "animal housing"@en .
+<http://aims.fao.org/aos/agrovoc/c_432> <http://www.w3.org/2004/02/skos/core#prefLabel> "Alojamiento de animales"@es .
+<http://aims.fao.org/aos/agrovoc/c_432> <http://www.w3.org/2004/02/skos/core#prefLabel> "Logement des animaux"@fr .
+<http://aims.fao.org/aos/agrovoc/c_25746> <http://www.w3.org/2004/02/skos/core#prefLabel> "Tierhaltungsausstattung"@de .
+<http://aims.fao.org/aos/agrovoc/c_25746> <http://www.w3.org/2004/02/skos/core#prefLabel> "animal husbandry equipment"@en .
+<http://aims.fao.org/aos/agrovoc/c_25746> <http://www.w3.org/2004/02/skos/core#prefLabel> "Equipo de crianza"@es .
+<http://aims.fao.org/aos/agrovoc/c_25746> <http://www.w3.org/2004/02/skos/core#prefLabel> "Mat\u00E9riel d'\u00E9levage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_1375> <http://www.w3.org/2004/02/skos/core#prefLabel> "Kastration"@de .
+<http://aims.fao.org/aos/agrovoc/c_1375> <http://www.w3.org/2004/02/skos/core#prefLabel> "castration"@en .
+<http://aims.fao.org/aos/agrovoc/c_1375> <http://www.w3.org/2004/02/skos/core#prefLabel> "Castraci\u00F3n"@es .
+<http://aims.fao.org/aos/agrovoc/c_1375> <http://www.w3.org/2004/02/skos/core#prefLabel> "Castration"@fr .
+<http://aims.fao.org/aos/agrovoc/c_6075> <http://www.w3.org/2004/02/skos/core#prefLabel> "Enthornen"@de .
+<http://aims.fao.org/aos/agrovoc/c_6075> <http://www.w3.org/2004/02/skos/core#prefLabel> "dehorning"@en .
+<http://aims.fao.org/aos/agrovoc/c_6075> <http://www.w3.org/2004/02/skos/core#prefLabel> "Descorne"@es .
+<http://aims.fao.org/aos/agrovoc/c_6075> <http://www.w3.org/2004/02/skos/core#prefLabel> "\u00C9cornage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_7020> <http://www.w3.org/2004/02/skos/core#prefLabel> "Beschatten"@de .
+<http://aims.fao.org/aos/agrovoc/c_7020> <http://www.w3.org/2004/02/skos/core#prefLabel> "shading"@en .
+<http://aims.fao.org/aos/agrovoc/c_7020> <http://www.w3.org/2004/02/skos/core#prefLabel> "Umbr\u00EDa"@es .
+<http://aims.fao.org/aos/agrovoc/c_7020> <http://www.w3.org/2004/02/skos/core#prefLabel> "Ombrage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_14228> <http://www.w3.org/2004/02/skos/core#prefLabel> "Geschlechtsdiagnose"@de .
+<http://aims.fao.org/aos/agrovoc/c_14228> <http://www.w3.org/2004/02/skos/core#prefLabel> "sex diagnosis"@en .
+<http://aims.fao.org/aos/agrovoc/c_14228> <http://www.w3.org/2004/02/skos/core#prefLabel> "Diagn\u00F3stico del sexo"@es .
+<http://aims.fao.org/aos/agrovoc/c_14228> <http://www.w3.org/2004/02/skos/core#prefLabel> "Sexage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_15980> <http://www.w3.org/2004/02/skos/core#prefLabel> "Wachstumssteuerung"@de .
+<http://aims.fao.org/aos/agrovoc/c_15980> <http://www.w3.org/2004/02/skos/core#prefLabel> "growth control"@en .
+<http://aims.fao.org/aos/agrovoc/c_15980> <http://www.w3.org/2004/02/skos/core#prefLabel> "Control del crecimiento"@es .
+<http://aims.fao.org/aos/agrovoc/c_15980> <http://www.w3.org/2004/02/skos/core#prefLabel> "Contr\u00F4le de croissance"@fr .
+<http://aims.fao.org/aos/agrovoc/c_25756> <http://www.w3.org/2004/02/skos/core#prefLabel> "Kennzeichnung (tier)"@de .
+<http://aims.fao.org/aos/agrovoc/c_25756> <http://www.w3.org/2004/02/skos/core#prefLabel> "marking"@en .
+<http://aims.fao.org/aos/agrovoc/c_25756> <http://www.w3.org/2004/02/skos/core#prefLabel> "Marcado del ganado"@es .
+<http://aims.fao.org/aos/agrovoc/c_25756> <http://www.w3.org/2004/02/skos/core#prefLabel> "Marquage des animaux"@fr .
+<http://aims.fao.org/aos/agrovoc/c_26813> <http://www.w3.org/2004/02/skos/core#prefLabel> "Aufzuchttechnik"@de .
+<http://aims.fao.org/aos/agrovoc/c_26813> <http://www.w3.org/2004/02/skos/core#prefLabel> "rearing techniques"@en .
+<http://aims.fao.org/aos/agrovoc/c_26813> <http://www.w3.org/2004/02/skos/core#prefLabel> "T\u00E9cnicas de crianza"@es .
+<http://aims.fao.org/aos/agrovoc/c_26813> <http://www.w3.org/2004/02/skos/core#prefLabel> "Technique d'\u00E9levage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_29461> <http://www.w3.org/2004/02/skos/core#prefLabel> "Tierhaltungssystem"@de .
+<http://aims.fao.org/aos/agrovoc/c_29461> <http://www.w3.org/2004/02/skos/core#prefLabel> "rearing systems"@en .
+<http://aims.fao.org/aos/agrovoc/c_29461> <http://www.w3.org/2004/02/skos/core#prefLabel> "Sistemas de cr\u00EDa"@es .
+<http://aims.fao.org/aos/agrovoc/c_29461> <http://www.w3.org/2004/02/skos/core#prefLabel> "Syst\u00E8me d'\u00E9levage"@fr .
+<http://aims.fao.org/aos/agrovoc/c_32674> <http://www.w3.org/2004/02/skos/core#prefLabel> "Induzierte Laktation"@de .
+<http://aims.fao.org/aos/agrovoc/c_32674> <http://www.w3.org/2004/02/skos/core#prefLabel> "induced lactation"@en .
+<http://aims.fao.org/aos/agrovoc/c_32674> <http://www.w3.org/2004/02/skos/core#prefLabel> "Lactaci\u00F3n inducida"@es .
+<http://aims.fao.org/aos/agrovoc/c_32674> <http://www.w3.org/2004/02/skos/core#prefLabel> "Induction de la lactation"@fr .
+<http://aims.fao.org/aos/agrovoc/c_35112> <http://www.w3.org/2004/02/skos/core#prefLabel> "Flushing"@de .
+<http://aims.fao.org/aos/agrovoc/c_35112> <http://www.w3.org/2004/02/skos/core#prefLabel> "flushing"@en .
+<http://aims.fao.org/aos/agrovoc/c_35112> <http://www.w3.org/2004/02/skos/core#prefLabel> "Flushing"@es .
+<http://aims.fao.org/aos/agrovoc/c_35112> <http://www.w3.org/2004/02/skos/core#prefLabel> "Flushing"@fr .
+<http://aims.fao.org/aos/agrovoc/c_36922> <http://www.w3.org/2004/02/skos/core#prefLabel> "Samengewinnung (tier)"@de .
+<http://aims.fao.org/aos/agrovoc/c_36922> <http://www.w3.org/2004/02/skos/core#prefLabel> "semen collection"@en .
+<http://aims.fao.org/aos/agrovoc/c_36922> <http://www.w3.org/2004/02/skos/core#prefLabel> "Recolecci\u00F3n de semen"@es .
+<http://aims.fao.org/aos/agrovoc/c_36922> <http://www.w3.org/2004/02/skos/core#prefLabel> "R\u00E9colte de sperme"@fr .
+<http://aims.fao.org/aos/agrovoc/c_638> <http://www.w3.org/2004/02/skos/core#prefLabel> "K\u00FCnstliche Besamung"@de .
+<http://aims.fao.org/aos/agrovoc/c_638> <http://www.w3.org/2004/02/skos/core#prefLabel> "artificial insemination"@en .
+<http://aims.fao.org/aos/agrovoc/c_638> <http://www.w3.org/2004/02/skos/core#prefLabel> "Inseminaci\u00F3n artificial"@es .
+<http://aims.fao.org/aos/agrovoc/c_638> <http://www.w3.org/2004/02/skos/core#prefLabel> "Ins\u00E9mination artificielle"@fr .
+<http://aims.fao.org/aos/agrovoc/c_6961> <http://www.w3.org/2004/02/skos/core#prefLabel> "Sperma"@de .
+<http://aims.fao.org/aos/agrovoc/c_6961> <http://www.w3.org/2004/02/skos/core#prefLabel> "semen"@en .
+<http://aims.fao.org/aos/agrovoc/c_6961> <http://www.w3.org/2004/02/skos/core#prefLabel> "Semen"@es .
+<http://aims.fao.org/aos/agrovoc/c_6961> <http://www.w3.org/2004/02/skos/core#prefLabel> "Sperme"@fr .

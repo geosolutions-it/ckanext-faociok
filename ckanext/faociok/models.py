@@ -42,7 +42,7 @@ class Vocabulary(DeclarativeBase):
 
     def valid_term(self, term):
         q = Session.query(VocabularyTerm).filter(VocabularyTerm.name==term)
-        return Session.query(q.exists())
+        return Session.query(q.exists()).scalar()
 
     @classmethod
     def create(cls, name, has_relations=False):
