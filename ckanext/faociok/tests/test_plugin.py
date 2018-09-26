@@ -6,6 +6,7 @@ import os
 
 from ckan.lib.base import config
 from ckan.plugins import toolkit as t
+from ckan import model
 from ckan.tests.helpers import change_config
 from ckanext.faociok.validators import CONFIG_FAO_DATATYPE
 from ckanext.faociok.commands.vocabulary import VocabularyCommands
@@ -13,9 +14,9 @@ from ckanext.faociok.tests import FaoBaseTestCase, _run_validator_checks, _load_
 from ckanext.faociok.models import Vocabulary
 
 
-# regular vocabulary import
-# m49 import 
-# agrovoc import
+# + regular vocabulary import
+# + m49 import 
+# + agrovoc import
 # agrovoc autocomplete
 # other autocomplete
 # validators
@@ -90,7 +91,12 @@ class ValidatorsTestCase(FaoBaseTestCase):
         
         _run_validator_checks(test_values, t.get_validator('fao_agrovoc'))
 
+class CommandTestCase(FaoBaseTestCase):
+
     def test_vocabulary_create(self):
+        """
+        Test vocabulary command items
+        """
         cli = VocabularyCommands('vocabulary')
         cli.cmd_create('test')
         resp = Vocabulary.get('test')
@@ -100,4 +106,28 @@ class ValidatorsTestCase(FaoBaseTestCase):
         usage = cli.usage
         self.assertIsNotNone(usage)
 
+class AutocompleteTestCase(FaoBaseTestCase):
 
+    def test_autocomplete(self):
+        """
+        Basic autocomplete action test
+        """
+        _load_vocabulary('datatype', 'faociok.datatype.csv')
+        autocomplete = t.get_action('fao_autocomplete')
+        ctx = {'mode': model}
+        data = {'q': 'oth',
+                'lang': 'en',
+                'offset': 0,
+                'limit': 10,
+                'vocabulary': 'datatype'}
+        out = autocomplete(ctx, data)
+        self.assertEqual(len(out['tags']), 1)
+        self.assertEqual(out['tags'][0]['term'], 'other')
+
+        data = {'q': 'oth',
+                'lang': 'en',
+                'offset': 10,
+                'limit': 10,
+                'vocabulary': 'datatype'}
+        out = autocomplete(ctx, data)
+        self.assertEqual(len(out['tags']), 0)

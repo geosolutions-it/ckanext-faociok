@@ -27,8 +27,10 @@ def fao_autocomplete(context, data_dict):
                           VocabularyLabel.lang == lang)))\
          .order_by(VocabularyTerm.name, VocabularyLabel.label)
 
-    q = q.offset(offset)
-    q = q.limit(limit)
+    if offset:
+        q = q.offset(offset)
+    if limit:
+        q = q.limit(limit)
     count = q.count()
     return {'tags': [{'name': t.name, 'term': t.name, 'label': t.label} for t in q.all()],
             'count':  count,
