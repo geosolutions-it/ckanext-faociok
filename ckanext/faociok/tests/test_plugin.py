@@ -7,17 +7,20 @@ import os
 from ckan.lib.base import config
 from ckan.plugins import toolkit as t
 from ckan import model
-from ckan.tests.helpers import change_config
+from ckan.logic import ValidationError
+
+from ckan.tests.helpers import change_config, FunctionalTestBase
 from ckanext.faociok.validators import CONFIG_FAO_DATATYPE
 from ckanext.faociok.commands.vocabulary import VocabularyCommands
 from ckanext.faociok.tests import FaoBaseTestCase, _run_validator_checks, _load_vocabulary, _get_path
-from ckanext.faociok.models import Vocabulary
+from ckanext.faociok.models import Vocabulary, VocabularyTerm, VocabularyLabel
 
 
 # + regular vocabulary import
 # + m49 import 
 # + agrovoc import
-# agrovoc autocomplete
+# + agrovoc autocomplete action
+# agrovoc autocomplete view
 # other autocomplete
 # validators
 
@@ -131,3 +134,44 @@ class AutocompleteTestCase(FaoBaseTestCase):
                 'vocabulary': 'datatype'}
         out = autocomplete(ctx, data)
         self.assertEqual(len(out['tags']), 0)
+
+
+        data = {}
+        self.assertRaises(ValidationError, autocomplete, ctx, data)
+
+
+class AutocompleteControllerTestCase(FunctionalTestBase, FaoBaseTestCase):
+
+    def test_autocomplete_view(self):
+        cli = VocabularyCommands('vocabulary')
+        cli.cmd_load('datatype', _get_path('faociok.datatype.csv'))
+        cli.cmd_import_m49(_get_path('M49_Codes.xlsx'))
+        # hack on stacked db session. cli will import data to one db session
+        # webapp view may use different session/transaction to retrive it
+        # so we make sure session is commited
+        model.Session.commit()
+        expected_id = '380'
+
+        app = self._get_test_app()
+        resp = app.get('/api/util/fao/autocomplete/m49_regions?incomplete=ita&lang=en')
+
+        found_it = False
+        for result in resp.json['ResultSet']['Result']:
+
+            if result['term'] == expected_id:
+                found_it = result
+                break
+
+        self.assertTrue(isinstance(found_it, dict), resp.json)
+        self.assertEqual(found_it['label'], 'Italy', found_it)
+
+        resp = app.get('/api/util/fao/autocomplete/m49_regions?incomplete=ita&lang=fr')
+        self.assertTrue(len(resp.json['ResultSet']['Result'])> 0, resp.json)
+        found_it = False
+        for result in resp.json['ResultSet']['Result']:
+            if result['term'] == expected_id:
+                found_it = result
+                break
+
+        self.assertTrue(isinstance(found_it, dict), resp.json)
+        self.assertTrue(found_it['label'].endswith(' [FR]'))

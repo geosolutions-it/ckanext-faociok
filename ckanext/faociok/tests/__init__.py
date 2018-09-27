@@ -34,7 +34,7 @@ def _call_validator(validator, value):
     errors = {key: []}
 
     try:
-        validator(key, converted_data, errors[key], context)
+        validator(key, converted_data, errors, context)
         if errors[key]:
             raise Invalid(errors[key])
         return converted_data[key]

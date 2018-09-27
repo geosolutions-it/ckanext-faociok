@@ -36,12 +36,12 @@ def fao_agrovoc(key, flattened_data, errors, context):
             v = Vocabulary.get(Vocabulary.VOCABULARY_AGROVOC)
             for term in value:
                 if not v.valid_term(term):
-                    errors.append(ValueError(_("Term not valid: {}").format(term)))
+                    errors[key].append(ValueError(_("Term not valid: {}").format(term)))
                     break
                 validated.append(term)
             flattened_data[key] = validated
         except Exception, err:
-            errors.append(Invalid(_("Invalid AGROVOC term: {} {}").format(value, err)))
+            errors[key].append(Invalid(_("Invalid AGROVOC term: {} {}").format(value, err)))
 
 def fao_m49_regions(key, flattened_data, errors, context):
     # we use extended api to update data dict in-place
@@ -57,12 +57,12 @@ def fao_m49_regions(key, flattened_data, errors, context):
             v = Vocabulary.get(Vocabulary.VOCABULARY_M49_REGIONS)
             for term in value:
                 if not v.valid_term(term):
-                    errors.append(ValueError(_("Term not valid: {}").format(term)))
+                    errors[key].append(ValueError(_("Term not valid: {}").format(term)))
                     break
                 validated.append(term)
             flattened_data[key] = validated
         except Exception, err:
-            errors.append(Invalid(_("Invalid m49 regions: {} {}").format(value, err)))
+            errors[key].append(Invalid(_("Invalid m49 regions: {} {}").format(value, err)))
 
 def _serialize_to_array(value):
     if isinstance(value, (str, unicode,)) and value.startswith('{') and value.endswith('}'):
