@@ -20,9 +20,9 @@ from ckanext.faociok.models import Vocabulary, VocabularyTerm, VocabularyLabel
 # + m49 import 
 # + agrovoc import
 # + agrovoc autocomplete action
-# agrovoc autocomplete view
-# other autocomplete
-# validators
+# + agrovoc autocomplete view
+# + other autocomplete
+# + validators
 
 # ddi harvester (import phase)
 # ckan harvester with fao fields
@@ -175,3 +175,10 @@ class AutocompleteControllerTestCase(FunctionalTestBase, FaoBaseTestCase):
 
         self.assertTrue(isinstance(found_it, dict), resp.json)
         self.assertTrue(found_it['label'].endswith(' [FR]'))
+
+
+        resp = app.get('/api/util/fao/autocomplete/datatype?incomplete=oth&lang=fr')
+        self.assertTrue(len(resp.json['ResultSet']['Result']) == 1, resp.json)
+        found_it = resp.json['ResultSet']['Result'][0]
+        self.assertTrue(isinstance(found_it, dict), resp.json)
+        self.assertEqual(found_it['label'].strip(), 'other FR', found_it)
