@@ -2,22 +2,24 @@
 # -*- coding: utf-8 -*-
 
 """Tests for plugin.py."""
-import os
 
-from ckan.lib.base import config
 from ckan.plugins import toolkit as t
 from ckan import model
 from ckan.logic import ValidationError
 
 from ckan.tests.helpers import change_config, FunctionalTestBase
+from ckanext.harvest.model import HarvestObject
 from ckanext.faociok.validators import CONFIG_FAO_DATATYPE
 from ckanext.faociok.commands.vocabulary import VocabularyCommands
-from ckanext.faociok.tests import FaoBaseTestCase, _run_validator_checks, _load_vocabulary, _get_path
+from ckanext.faociok.tests import (FaoBaseTestCase, _run_validator_checks,
+                                   _load_vocabulary, _get_path,
+                                   HarvesterTestCase)
 from ckanext.faociok.models import Vocabulary, VocabularyTerm, VocabularyLabel
+from ckanext.faociok.harvesters.ddiharvester import FaoNadaHarvester
 
 
 # + regular vocabulary import
-# + m49 import 
+# + m49 import
 # + agrovoc import
 # + agrovoc autocomplete action
 # + agrovoc autocomplete view
@@ -182,3 +184,25 @@ class AutocompleteControllerTestCase(FunctionalTestBase, FaoBaseTestCase):
         found_it = resp.json['ResultSet']['Result'][0]
         self.assertTrue(isinstance(found_it, dict), resp.json)
         self.assertEqual(found_it['label'].strip(), 'other FR', found_it)
+
+class DDIHarvesterTestCase(HarvesterTestCase):
+
+    def test_harvester(self):
+        cli = VocabularyCommands('vocabulary')
+        cli.cmd_import_agrovoc(_get_path('agrovoc_excerpt.nt'))
+        cli.cmd_load('datatype', _get_path('faociok.datatype.csv'))
+        cli.cmd_import_m49(_get_path('M49_Codes.xlsx'))
+
+
+        h = self._create_harvest_obj('http://test/sourc/a',
+                                     source_type='fao-nada')
+        hobj = HarvestObject.get(h['id'])
+        with open(_get_path('harvest_object_content'), 'rt') as f:
+            hobj.content = f.read()
+        harv = FaoNadaHarvester()
+        out = harv.import_stage(hobj)
+        self.assertTrue(isinstance(out, dict), out)
+        self.assertEqual(out.get('fao_datatype'), 'microdata', out.get('fao_datatype'))
+        # 188 - Costa Rica
+        self.assertEqual(out.get('fao_m49_regions'), '{188}', out.get('fao_m49_regions'))
+        self.assertEqual(out.get('fao_agrovoc'), '{}', out.get('fao_agrovoc'))

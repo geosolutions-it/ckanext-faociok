@@ -125,5 +125,3 @@ class FaoNadaHarvester(NadaHarvester):
         out = pupd(self._get_context(), ret)
         
         return ret
-
-
