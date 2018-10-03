@@ -75,8 +75,7 @@ def _run_validator_checks(test_values, validator):
 class FaoBaseTestCase(unittest.TestCase):
 
     def setUp(self):
-        repo.clean_db()
-        repo.rebuild_db()
+        helpers.reset_db()
         setup_models()
 
     def tearDown(self):

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
-from ckan.common import _, ungettext, config
+from ckan.lib.base import _, ungettext, config
 from ckan.plugins.toolkit import Invalid
 from ckanext.faociok.models import Vocabulary
 from ckan.lib.navl.dictization_functions import Missing

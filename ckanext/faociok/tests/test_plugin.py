@@ -3,6 +3,9 @@
 
 """Tests for plugin.py."""
 
+import sys
+import gzip
+import logging
 from ckan.plugins import toolkit as t
 from ckan import model
 from ckan.logic import ValidationError
@@ -187,22 +190,34 @@ class AutocompleteControllerTestCase(FunctionalTestBase, FaoBaseTestCase):
 
 class DDIHarvesterTestCase(HarvesterTestCase):
 
+    @change_config(CONFIG_FAO_DATATYPE, 'microdata')
     def test_harvester(self):
+        di = logging.getLogger('ckanext.ddi.harvesters.ddiharvester')
+        bs = logging.getLogger('ckanext.harvest.harvesters.base')
+        di.setLevel(logging.DEBUG)
+        bs.setLevel(logging.DEBUG)
+        sout = logging.StreamHandler(sys.stdout)
+        sout.setLevel(logging.DEBUG)
+        bs.addHandler(sout)
+        di.addHandler(sout)
+
         cli = VocabularyCommands('vocabulary')
         cli.cmd_import_agrovoc(_get_path('agrovoc_excerpt.nt'))
         cli.cmd_load('datatype', _get_path('faociok.datatype.csv'))
         cli.cmd_import_m49(_get_path('M49_Codes.xlsx'))
 
-
         h = self._create_harvest_obj('http://test/sourc/a',
                                      source_type='fao-nada')
         hobj = HarvestObject.get(h['id'])
-        with open(_get_path('harvest_object_content'), 'rt') as f:
+
+        with gzip.open(_get_path('harvest_object_content.gz'), 'rb') as f:
             hobj.content = f.read()
         harv = FaoNadaHarvester()
+
         out = harv.import_stage(hobj)
-        self.assertTrue(isinstance(out, dict), out)
+        
+        self.assertTrue(isinstance(out, dict), [(herr.message, herr.stage, herr.line) for herr in hobj.errors])
         self.assertEqual(out.get('fao_datatype'), 'microdata', out.get('fao_datatype'))
         # 188 - Costa Rica
         self.assertEqual(out.get('fao_m49_regions'), '{188}', out.get('fao_m49_regions'))
-        self.assertEqual(out.get('fao_agrovoc'), '{}', out.get('fao_agrovoc'))
+        self.assertTrue(out.get('fao_agrovoc') in ('{}', []), out.get('fao_agrovoc'))
