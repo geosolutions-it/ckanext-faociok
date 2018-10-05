@@ -4,6 +4,7 @@
 from sqlalchemy import and_, or_
 from ckan.logic import get_or_bust
 from ckanext.faociok.models import VocabularyTerm, Vocabulary, VocabularyLabel
+from ckan.lib.base import c
 
 def fao_autocomplete(context, data_dict):
     model = context['model']
@@ -24,12 +25,15 @@ def fao_autocomplete(context, data_dict):
     q = q.distinct()\
          .filter(or_(VocabularyTerm.name == term,
                      and_(VocabularyLabel.label.ilike('%{}%'.format(term)),
-                          VocabularyLabel.lang == lang)))\
+                          VocabularyLabel.lang == lang).self_group()).self_group())\
          .order_by(VocabularyTerm.name, VocabularyLabel.label)
 
-    q = q.offset(offset)
-    q = q.limit(limit)
+    if offset:
+        q = q.offset(offset)
+    if limit:
+        q = q.limit(limit)
     count = q.count()
+
     return {'tags': [{'name': t.name, 'term': t.name, 'label': t.label} for t in q.all()],
             'count':  count,
             'lang': lang}

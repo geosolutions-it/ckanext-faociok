@@ -16,7 +16,9 @@ import ckan.plugins.toolkit as toolkit
 from ckan.lib.base import config
 from ckan.lib.cli import CkanCommand
 
-from ckanext.faociok.models import Vocabulary, VocabularyTerm, Session, load_vocabulary, find_unused_terms
+from ckanext.faociok.models import (Vocabulary, VocabularyTerm,
+                                    Session, load_vocabulary,
+                                    find_unused_terms, setup_models)
 
 log = logging.getLogger(__name__)
 
@@ -37,6 +39,9 @@ class VocabularyCommands(CkanCommand):
             cusage = self.command_usage(ckey, cmd)
             out.append(cusage)
         return '\n'.join(out)
+
+    def cmd_initdb(self, *args, **kwargs):
+        setup_models()
 
     def cmd_list(self, *args, **kwargs):
         """
