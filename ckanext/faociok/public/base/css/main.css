@@ -10831,11 +10831,8 @@ h5 {
 
 .select2-drop {
   border-color: transparent;
-  visibility: hidden;
 }
-.select2-drop-mask {
-  visibility: hidden;
-}
+
 .language-header .lang-select {
   display: none;
 }
@@ -10846,11 +10843,5 @@ h5 {
   }
   .language-header .lang-select-inline-list {
     display: none;
-  }
-  .select2-drop {
-    visibility: visible;
-  }
-  .select2-drop-mask {
-    visibility: visible;
   }
 }
