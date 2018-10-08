@@ -8664,10 +8664,6 @@ h4 small {
   .masthead .site-search {
     display: none;
   }
-
-  .masthead .container .language-header-container {
-    margin-top: 12px;
-  }
 }
 .site-footer {
   *zoom: 1;
@@ -10793,6 +10789,30 @@ h5 {
   background: #0d6cac;
   padding: 8px;
 }
+.masthead.language-header {
+  background-color: #f7f8f9;
+  min-height: 0;
+}
+.language-header-container {
+  padding: 10px;
+  padding-right: 0;
+}
+.lang-select-inline-list > div {
+  float: left;
+}
+.lang-select-inline-list > div > a {
+  font-weight: normal;
+  color: #5191c8;
+  margin: 0 10px;
+  text-transform: capitalize;
+  font-size: 12px;
+  text-decoration: none;
+  outline: none;
+}
+
+.lang-select-inline-list > .lang-current > a {
+  color: #000;
+}
 
 .language-header-container > .lang-select {
   margin: 4px 0;
@@ -10811,4 +10831,26 @@ h5 {
 
 .select2-drop {
   border-color: transparent;
+  visibility: hidden;
+}
+.select2-drop-mask {
+  visibility: hidden;
+}
+.language-header .lang-select {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .language-header .lang-select {
+    display: block;
+  }
+  .language-header .lang-select-inline-list {
+    display: none;
+  }
+  .select2-drop {
+    visibility: visible;
+  }
+  .select2-drop-mask {
+    visibility: visible;
+  }
 }
