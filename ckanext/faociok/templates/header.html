@@ -15,7 +15,13 @@
                 <h2>{{ g.site_description }}</h2>
                 {% endif %} {% endif %}
             </hgroup>
-            <div class="pull-right language-header-container">{% snippet "snippets/language_selector.html" %}</div>
+        </div>
+    </header>
+    <header class="navbar-static-top masthead language-header">
+        <div class="container">
+            <div class="language-header-container pull-right">
+                {% snippet "snippets/language_selector.html" %}
+            </div>
         </div>
     </header>
 {% endblock %}
