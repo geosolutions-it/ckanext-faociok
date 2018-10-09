@@ -46,14 +46,6 @@ echo "Setting up Solr..."
 printf "NO_START=0\nJETTY_HOST=127.0.0.1\nJETTY_PORT=8983\nJAVA_HOME=$JAVA_HOME" | sudo tee /etc/default/jetty
 sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
 
-# dcatapit scpecific
-sudo sed -i -e 's-</fields>-<field name="dcat_theme" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
-sudo sed -i -e 's-</fields>-<field name="dcat_subtheme" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
-sudo sed -i -e 's-</fields>-<field name="dcat_subtheme_*" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
-sudo sed -i -e 's-</fields>-<field name="organization_region_*" type="string" indexed="true" stored="false" multiValued="false"/>\n</fields>-g' /etc/solr/conf/schema.xml
-sudo sed -i -e 's-</fields>-<field name="resource_license_*" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
-sudo sed -i -e 's-</fields>-<field name="resource_license" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
-
 # fao specific
 sudo sed -i -e 's-</fields>-<field name="fao_m49_regions*" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
 sudo sed -i -e 's-</fields>-<field name="fao_agrovoc*" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
@@ -94,20 +86,6 @@ python setup.py develop
 pip install -r requirements.txt
 cd -
 
-echo "Installing ckanext-multilang and its requirements..."
-git clone https://github.com/geosolutions-it/ckanext-multilang
-cd ckanext-multilang
-python setup.py develop
-cd -
-
-echo "Installing ckanext-dcatapit and its requirements..."
-git clone https://github.com/geosolutions-it/ckanext-dcatapit
-cd ckanext-dcatapit
-python setup.py develop
-pip install -r dev-requirements.txt
-pip install -e .
-cd -
-
 echo "Installing ckanext-scheming and its requirements..."
 git clone https://github.com/ckan/ckanext-scheming
 cd ckanext-scheming
@@ -137,21 +115,6 @@ echo "initializing database for ckan"
 paster --plugin=ckan db init -c test.ini
 echo ".. ckanext-harvest "
 paster --plugin=ckanext-harvest harvester initdb -c test.ini
-echo ".. ckanext-multilang "
-paster --plugin=ckanext-multilang multilangdb initdb -c test.ini
-echo ".. ckanext-dcatapit"
-paster --plugin=ckanext-dcatapit vocabulary initdb -c test.ini
-paster --plugin=ckanext-dcatapit vocabulary load --name licenses --filename ../ckanext-dcatapit/examples/licenses.rdf -c test.ini
-paster --plugin=ckanext-dcatapit vocabulary load --url http://publications.europa.eu/mdr/resource/authority/language/skos/languages-skos.rdf --name languages --config=test.ini
-paster --plugin=ckanext-dcatapit vocabulary load --url http://publications.europa.eu/mdr/resource/authority/data-theme/skos/data-theme-skos.rdf --name eu_themes --config=test.ini
-paster --plugin=ckanext-dcatapit vocabulary load --url http://publications.europa.eu/mdr/resource/authority/place/skos/places-skos.rdf --name places --config=test.ini
-paster --plugin=ckanext-dcatapit vocabulary load --url http://publications.europa.eu/mdr/resource/authority/frequency/skos/frequencies-skos.rdf --name frequencies --config=test.ini
-paster --plugin=ckanext-dcatapit vocabulary load --url http://publications.europa.eu/mdr/resource/authority/file-type/skos/filetypes-skos.rdf  --name filetype --config=test.ini
-
-curl https://raw.githubusercontent.com/italia/daf-ontologie-vocabolari-controllati/master/VocabolariControllati/territorial-classifications/regions/regions.rdf > regions.rdf
-paster --plugin=ckanext-dcatapit vocabulary load --filename regions.rdf --name regions --config=test.ini
-
-
 
 echo ".. ckanext-faociok "
 paster --plugin=ckanext-faociok vocabulary initdb -c test.ini 
