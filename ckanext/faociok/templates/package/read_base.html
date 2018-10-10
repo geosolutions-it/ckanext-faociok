@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+
+{% block package_info %}
+    {{ super() }}
+    {% snippet 'package/snippets/share_formats.html', pkg=pkg %}
+
+{% endblock %}
