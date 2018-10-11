@@ -50,6 +50,8 @@ sudo cp ckan/ckan/config/solr/schema.xml /etc/solr/conf/schema.xml
 sudo sed -i -e 's-</fields>-<field name="fao_m49_regions*" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
 sudo sed -i -e 's-</fields>-<field name="fao_agrovoc*" type="string" indexed="true" stored="false" multiValued="true"/>\n</fields>-g' /etc/solr/conf/schema.xml
 
+cat /etc/solr/conf/schema.xml | grep -i fao_
+
 sudo service jetty restart
 
 echo
