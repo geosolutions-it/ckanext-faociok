@@ -5,6 +5,7 @@ import logging
 import json
 import csv
 
+from ckan.plugins import toolkit as t
 from ckan.common import _, ungettext
 from ckan.model import Package, PackageExtra, Session
 
@@ -42,6 +43,13 @@ class Vocabulary(DeclarativeBase):
         Schema field related to vocabulary
         """
         return 'fao_{}'.format(self.name)
+
+    @property
+    def is_multivalued(self):
+        """
+        Return flag if package can have multiple terms for given vocabulary
+        """
+        return self.name != self.VOCABULARY_DATATYPE
 
     def __str__(self):
         return 'Vocabulary({}{})'.format(self.name, 
@@ -84,13 +92,47 @@ class Vocabulary(DeclarativeBase):
             raise ValueError(u"Old term {} is not valid".format(old_term))
         if not self.valid_term(new_term):
             raise ValueError(u"New term {} is not valid".format(new_term))
-        q = Session.query(PackageExtra).join(Package, Package.id==PackageExtra.package_id)\
-                                       .filter(PackageExtra.key==self.field_name,
-                                               PackageExtra.value==old_term,
-                                               Package.state=='active')\
-                                       .update({PackageExtra.value: new_term})
-        Session.flush()
 
+        if self.is_multivalued:
+            q = Session.query(PackageExtra.package_id).join(Package, Package.id==PackageExtra.package_id)\
+                                           .filter(PackageExtra.key==self.field_name,
+                                                   PackageExtra.value.like('%{}%'.format(old_term)),
+                                                   Package.state=='active')
+
+        else:
+            q = Session.query(PackageExtra.package_id).join(Package, Package.id==PackageExtra.package_id)\
+                                           .filter(PackageExtra.key==self.field_name,
+                                                   PackageExtra.value==old_term,
+                                                   Package.state=='active')
+        
+        # import in function to avoid circular dependencies
+        from ckanext.faociok.tests import _get_user
+        from ckanext.faociok.validators import _serialize_to_array, _deserialize_from_array
+
+        ctx = {'ignore_auth': True,
+               'user': _get_user()['name']}
+
+        pshow = t.get_action('package_show')
+        pupdate = t.get_action('package_update')
+        for pdata in q:
+            pkg = pshow(ctx.copy(), {'name_or_id': pdata[0]})
+            fdata = pkg.get(self.field_name)
+            affected = False
+            if self.is_multivalued:
+                fdata = _deserialize_from_array(fdata)
+                if old_term in fdata:
+                    fdata.remove(old_term)
+                    fdata.append(new_term)
+                    fdata = _serialize_to_array(fdata)
+                    affected = True
+            else:
+                fdata = new_term
+                affected = True
+            if affected:
+                pkg[self.field_name] = fdata
+                pkg.pop('metadata_modified', None)
+                pupdate(ctx.copy(), pkg)
+    
     @classmethod
     def get_all(cls):
         q = Session.query(cls).all()

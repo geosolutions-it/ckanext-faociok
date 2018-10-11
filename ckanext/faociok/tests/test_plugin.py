@@ -160,6 +160,15 @@ class CommandTestCase(FaoBaseTestCase):
 
         self.assertEqual(p['fao_datatype'], 'microdata', p)
 
+        cli.cmd_rename_term('m49_regions', '9', '21')
+        Session.commit()
+        p = package_show({'ignore_auth': True,
+                          'use_cache': False},
+                         {'name_or_id': 'sometitle'})
+        
+        self.assertEqual(set(p['fao_m49_regions']), set(['8', '21']), p.get('fao_m49_regions'))
+
+
 
 class AutocompleteTestCase(FaoBaseTestCase):
 
