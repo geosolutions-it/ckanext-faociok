@@ -129,7 +129,7 @@ In case of a need of bulk change of one term to another for specific vocabulary,
 2. If needed, you can import new vocabulary data without old term. Again, folowing is example invocation, assuming `faociok.dataty.ecsv` doesn't have `monitoring` term anymore:
 
     paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
-**NOTE**: Both terms should be present in vocabulary during term migration.
+**note:** Both terms should be present in vocabulary during term migration.
 
 ## Deployment notes
 
