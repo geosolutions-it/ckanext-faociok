@@ -3,6 +3,7 @@
 
 {% block secondary_content %}
     {{ super() }}
+    {% resource 'faociok/faociok.css' %}
     {% snippet 'package/snippets/share_formats.html', pkg=pkg %}
 
 {% endblock %}
