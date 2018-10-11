@@ -129,6 +129,8 @@ In case of a need of bulk change of one term to another for specific vocabulary,
 2. If needed, you can import new vocabulary data without old term. Again, folowing is example invocation, assuming `faociok.dataty.ecsv` doesn't have `monitoring` term anymore:
 
     paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
+**NOTE**: Both terms should be present in vocabulary during term migration.
+
 ## Deployment notes
 
 When using FAO/NADA harvester, some ddi-specific fields in dataset may be large (especially `sampling_procedure_notes`). This is rather unfrequent situation, but it may cause error during indexation in Solr. CKAN tries to put all fields from dataset into index, including extra fields, so those fields also qualify. However, default field type is string, which can hold up to 32k of text. See `Solr Fields Ref, StrField <https://lucene.apache.org/solr/guide/6_6/field-types-included-with-solr.html>`. This can cause exceptions during indexing. We suggest two approaches to manage this:
