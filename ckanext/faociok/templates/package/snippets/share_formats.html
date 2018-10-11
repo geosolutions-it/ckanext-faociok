@@ -1,0 +1,11 @@
+<section class="module module-narrow module-shallow">
+          <h2 class="module-heading"><i class="icon icon-share-alt"></i> {{ _("Share metadata") }}</h2>
+            <div class="module-content">
+                <p>
+                    The information on this page (the dataset metadata) is also available in these formats.</p>
+                <div class="text-center">
+                    <a class="padding10r" href="{{ h.url_for('/api/action/package_show', name_or_id=pkg['name']) }}"><img src="{{ h.url_for('/base/images/faociok/json.png') }}"/> JSON</a>
+                    <a class="" href="{{ h.url_for('dcat_dataset', _id=pkg['name'], _format='rdf') }}"><img src="{{ h.url_for('/base/images/faociok/rdf.png') }}"/> RDF</a>
+                </div>
+            </div>
+</section>
