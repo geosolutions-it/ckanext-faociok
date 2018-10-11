@@ -70,7 +70,8 @@ class VocabularyCommands(CkanCommand):
         syntax: rename_term vocabulary_name old_term new_term
         """
         v = Vocabulary.get(vocabulary_name)
-        v.rename_term_in_extras(old_term, new_term)
+        count = v.rename_term_in_extras(old_term, new_term)
+        print(u'Updated {} datasets.'.format(count))
 
     def cmd_load(self, vocabulary_name, path, *args, **kwargs):
         """

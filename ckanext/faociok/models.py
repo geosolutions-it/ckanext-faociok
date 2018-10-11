@@ -97,12 +97,14 @@ class Vocabulary(DeclarativeBase):
             q = Session.query(PackageExtra.package_id).join(Package, Package.id==PackageExtra.package_id)\
                                            .filter(PackageExtra.key==self.field_name,
                                                    PackageExtra.value.like('%{}%'.format(old_term)),
+                                                   Package.type=='dataset',
                                                    Package.state=='active')
 
         else:
             q = Session.query(PackageExtra.package_id).join(Package, Package.id==PackageExtra.package_id)\
                                            .filter(PackageExtra.key==self.field_name,
                                                    PackageExtra.value==old_term,
+                                                   Package.type=='dataset',
                                                    Package.state=='active')
         
         # import in function to avoid circular dependencies
@@ -114,6 +116,7 @@ class Vocabulary(DeclarativeBase):
 
         pshow = t.get_action('package_show')
         pupdate = t.get_action('package_update')
+        counter = 0
         for pdata in q:
             pkg = pshow(ctx.copy(), {'name_or_id': pdata[0]})
             fdata = pkg.get(self.field_name)
@@ -132,6 +135,8 @@ class Vocabulary(DeclarativeBase):
                 pkg[self.field_name] = fdata
                 pkg.pop('metadata_modified', None)
                 pupdate(ctx.copy(), pkg)
+                counter += 1
+        return counter
     
     @classmethod
     def get_all(cls):
