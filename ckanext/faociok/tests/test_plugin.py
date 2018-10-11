@@ -8,9 +8,12 @@ import gzip
 import logging
 from ckan.plugins import toolkit as t
 from ckan import model
+from ckan.model import Session, Package, PackageExtra
+
 from ckan.logic import ValidationError
 
-from ckan.tests.helpers import change_config, FunctionalTestBase
+from ckan.tests.helpers import change_config, FunctionalTestBase, call_action
+
 from ckanext.harvest.model import HarvestObject
 from ckanext.faociok.validators import CONFIG_FAO_DATATYPE
 from ckanext.faociok.commands.vocabulary import VocabularyCommands
@@ -113,6 +116,50 @@ class CommandTestCase(FaoBaseTestCase):
         cli.cmd_list()
         usage = cli.usage
         self.assertIsNotNone(usage)
+    
+    def test_vocabulary_term_rename(self):
+        """
+        Test vocabulary rename_term command
+        """
+        cli = VocabularyCommands('vocabulary')
+        cli.cmd_import_m49(_get_path('M49_Codes.xlsx'))
+        _load_vocabulary('datatype', 'faociok.datatype.csv')
+        cli.cmd_import_agrovoc(_get_path('agrovoc_excerpt.nt'))
+
+
+        dataset = {'title': 'some title',
+                   'id': 'sometitle',
+                   'name': 'sometitle',
+                   'fao_datatype': 'other',
+                   'fao_m49_regions': ['9', '8'],
+                   'fao_agrovoc': ['c_432', 'c_7020'],
+                   'resources': [],
+                    }
+
+        pkg = self._create_dataset(dataset)
+
+        self.assertRaises(ValueError, cli.cmd_rename_term, 'invalid-vocabulary', None, None)
+        self.assertRaises(ValueError, cli.cmd_rename_term, 'datatype', 'missing', 'other')
+        self.assertRaises(ValueError, cli.cmd_rename_term, 'datatype', 'monitoring', 'otherrr')
+
+        cli.cmd_rename_term('datatype', 'other', 'microdata')
+        # we're changing db in line above, need to flush
+        Session.commit()
+
+        q = Session.query(PackageExtra.package_id).join(Package, Package.id==PackageExtra.package_id)\
+                                                  .filter(PackageExtra.key=='fao_datatype',
+                                                          PackageExtra.value=='microdata',
+                                                          Package.state=='active')\
+                                                  .scalar()
+        self.assertEqual(q, pkg['id'])
+
+        package_show = t.get_action('package_show')
+        p = package_show({'ignore_auth': True,
+                          'use_cache': False},
+                         {'name_or_id': 'sometitle'})
+
+        self.assertEqual(p['fao_datatype'], 'microdata', p)
+
 
 class AutocompleteTestCase(FaoBaseTestCase):
 

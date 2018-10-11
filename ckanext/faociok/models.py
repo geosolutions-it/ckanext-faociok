@@ -36,6 +36,13 @@ class Vocabulary(DeclarativeBase):
     
     terms = orm.relationship('VocabularyTerm', back_populates='vocabulary')
 
+    @property
+    def field_name(self):
+        """
+        Schema field related to vocabulary
+        """
+        return 'fao_{}'.format(self.name)
+
     def __str__(self):
         return 'Vocabulary({}{})'.format(self.name, 
                                           ' with relations' if self.has_relations else '')
@@ -71,6 +78,18 @@ class Vocabulary(DeclarativeBase):
         #    Session.delete(vl)
         Session.flush()
 
+    def rename_term_in_extras(self, old_term, new_term):
+
+        if not self.valid_term(old_term):
+            raise ValueError(u"Old term {} is not valid".format(old_term))
+        if not self.valid_term(new_term):
+            raise ValueError(u"New term {} is not valid".format(new_term))
+        q = Session.query(PackageExtra).join(Package, Package.id==PackageExtra.package_id)\
+                                       .filter(PackageExtra.key==self.field_name,
+                                               PackageExtra.value==old_term,
+                                               Package.state=='active')\
+                                       .update({PackageExtra.value: new_term})
+        Session.flush()
 
     @classmethod
     def get_all(cls):

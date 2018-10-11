@@ -71,8 +71,23 @@ def _run_validator_checks(test_values, validator):
                 err or 'expected error, but got no validation error',
                 value)
 
+def _get_user():
+    user = t.get_action('get_site_user')(
+        {'ignore_auth': True, 'defer_commit': True},
+        {})
+    return user
+
+def _create_dataset(data):
+    pkg = helpers.call_action('package_create', {'user': _get_user()['name']}, **data)
+
+    return pkg
+
 
 class FaoBaseTestCase(unittest.TestCase):
+
+
+    def _create_dataset(self, data):
+        return _create_dataset(data)
 
     def setUp(self):
         helpers.reset_db()
@@ -88,6 +103,7 @@ class HarvesterTestCase(FaoBaseTestCase):
         super(HarvesterTestCase, self).setUp()
         print('setting up harvest models')
         setup_harvester_models()
+
 
     def _create_harvest_source(self, ctx, mock_url, **kwargs):
 
