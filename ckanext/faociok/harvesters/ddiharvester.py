@@ -84,22 +84,8 @@ class FaoNadaHarvester(NadaHarvester):
                 region = region[0]
         extras = ret.get('extras') or []
 
-        # microdata don't have any datatype field, so we use predefined one, 'microdata'
-        # in case this is changed in ckan, we should preserve this field in updated dataset
-        found_in_extras = -1
-        for idx, ex in enumerate(extras):
-            if ex['key'] == 'fao_datatype':
-                found_in_extras = idx
-                break
-        if found_in_extras > -1:
-            orig_datatype = extras[found_in_extras]
-            # might be Missing instance
-            if isinstance(orig_datatype['value'], (str, unicode,)):
-                ret['fao_datatype'] = orig_datatype['value']
-            else:
-                ret['fao_datatype'] = 'microdata'
-        else:
-            ret['fao_datatype'] = 'microdata'
+        # force microdata datatype for imported packages
+        ret['fao_datatype'] = 'microdata'
 
         # agrovoc is local, so we need to preserve
         found_in_extras = -1
@@ -110,7 +96,7 @@ class FaoNadaHarvester(NadaHarvester):
         if found_in_extras > -1:
             orig_agrovoc = extras[found_in_extras]
             # might be Missing instance
-            if isinstance(orig_datatype['value'], (str, unicode,)):
+            if isinstance(orig_agrovoc['value'], (str, unicode,)):
                 ret['fao_agrovoc'] = orig_agrovoc['value']
             else:
                 ret['fao_agrovoc'] = '{}'
