@@ -10,10 +10,7 @@ from ckan.plugins.toolkit import Invalid
 from ckan.model.meta import Session
 from ckan.model import repo
 from ckan.plugins import toolkit as t
-try:
-    from ckan.tests import helpers
-except ImportError:
-    from ckan.new_tests import helpers
+from ckan.tests import helpers
 
 from ckanext.faociok.models import load_vocabulary, setup_models
 from ckanext.harvest.model import setup as setup_harvester_models
