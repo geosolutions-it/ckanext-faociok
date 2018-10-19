@@ -20,6 +20,7 @@ from ckan.model import meta, repo
 
 
 log = logging.getLogger(__name__)
+from ckanext.faociok.utils import _get_user
 
 
 DeclarativeBase = declarative_base(metadata=meta.metadata)
@@ -108,7 +109,6 @@ class Vocabulary(DeclarativeBase):
                                                    Package.state=='active')
         
         # import in function to avoid circular dependencies
-        from ckanext.faociok.tests import _get_user
         from ckanext.faociok.validators import _serialize_to_array, _deserialize_from_array
 
         ctx = {'ignore_auth': True,

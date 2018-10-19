@@ -8,12 +8,16 @@ import unittest
 from ckan import model
 from ckan.plugins.toolkit import Invalid
 from ckan.model.meta import Session
-from ckan.model import repo
 from ckan.plugins import toolkit as t
 from ckan.tests import helpers
 
 from ckanext.faociok.models import load_vocabulary, setup_models
 from ckanext.harvest.model import setup as setup_harvester_models
+from ckanext.faociok.utils import _get_user
+
+def _create_dataset(data):
+    pkg = helpers.call_action('package_create', {'user': _get_user()['name']}, **data)
+    return pkg
 
 
 def _load_vocabulary(vname, fname):
@@ -68,16 +72,6 @@ def _run_validator_checks(test_values, validator):
                 err or 'expected error, but got no validation error',
                 value)
 
-def _get_user():
-    user = t.get_action('get_site_user')(
-        {'ignore_auth': True, 'defer_commit': True},
-        {})
-    return user
-
-def _create_dataset(data):
-    pkg = helpers.call_action('package_create', {'user': _get_user()['name']}, **data)
-
-    return pkg
 
 
 class FaoBaseTestCase(unittest.TestCase):
