@@ -62,7 +62,17 @@ class VocabularyCommands(CkanCommand):
 
         """
         Vocabulary.create(vocabulary_name, bool(has_relations))
-         
+   
+    def cmd_rename_term(self, vocabulary_name, old_term, new_term, *args, **kwargs):
+        """
+        Rename occurences of vocabulary old_term to new_term
+
+        syntax: rename_term vocabulary_name old_term new_term
+        """
+        v = Vocabulary.get(vocabulary_name)
+        count = v.rename_term_in_extras(old_term, new_term)
+        print(u'Updated {} datasets.'.format(count))
+
     def cmd_load(self, vocabulary_name, path, *args, **kwargs):
         """
         Load vocabulary data

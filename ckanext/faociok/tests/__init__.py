@@ -8,15 +8,16 @@ import unittest
 from ckan import model
 from ckan.plugins.toolkit import Invalid
 from ckan.model.meta import Session
-from ckan.model import repo
 from ckan.plugins import toolkit as t
-try:
-    from ckan.tests import helpers
-except ImportError:
-    from ckan.new_tests import helpers
+from ckan.tests import helpers
 
 from ckanext.faociok.models import load_vocabulary, setup_models
 from ckanext.harvest.model import setup as setup_harvester_models
+from ckanext.faociok.utils import _get_user
+
+def _create_dataset(data):
+    pkg = helpers.call_action('package_create', {'user': _get_user()['name']}, **data)
+    return pkg
 
 
 def _load_vocabulary(vname, fname):
@@ -72,7 +73,12 @@ def _run_validator_checks(test_values, validator):
                 value)
 
 
+
 class FaoBaseTestCase(unittest.TestCase):
+
+
+    def _create_dataset(self, data):
+        return _create_dataset(data)
 
     def setUp(self):
         helpers.reset_db()
@@ -88,6 +94,7 @@ class HarvesterTestCase(FaoBaseTestCase):
         super(HarvesterTestCase, self).setUp()
         print('setting up harvest models')
         setup_harvester_models()
+
 
     def _create_harvest_source(self, ctx, mock_url, **kwargs):
 
