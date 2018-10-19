@@ -120,13 +120,13 @@ FAO-CIOK extension comes with DDI harvester which will add FAO-CIOK-specific fie
 
 ## Vocabulary term migration
 
-In case of a need of bulk change of one term to another for specific vocabulary, this can be done in following way:
+In case of a need of bulk change of one term to another for specific vocabulary, this can be done in the following way:
 
-1. Run `vocabulary rename_term` command with name of vocabulary, old term and new term. Following is example invocation:
+1. Run `vocabulary rename_term` command with name of vocabulary, old term and new term. Below an example of invocation:
 
     paster --plugin=ckanext-faociok vocabulary rename_term datatype monitoring other --config=/etc/ckan/default/production.ini
 
-2. If needed, you can import new vocabulary data without old term. Again, folowing is example invocation, assuming `faociok.dataty.ecsv` doesn't have `monitoring` term anymore:
+2. If needed, you can import new vocabulary data without old term. Again, below an example of invocation, assuming `faociok.dataty.ecsv` doesn't have `monitoring` term anymore:
 
     paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini  
 
