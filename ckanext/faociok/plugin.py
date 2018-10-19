@@ -123,6 +123,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
             'get_fao_groups_featured': h.get_groups_featured,
             'get_fao_organizations_featured': h.get_organizations_featured,
             'get_fao_locations_featured': h.get_locations_featured,
+            'get_fao_datatype_items': h.get_datatype_items,
         }
 
     # IFacets
