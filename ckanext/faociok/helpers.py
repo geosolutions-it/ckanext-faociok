@@ -155,4 +155,5 @@ def get_datatype_items():
                 if item['value'] == d:
                     yield item
     else:
-        get_vocabulary_items_annotated('datatype')[:4]
+        for item in get_vocabulary_items_annotated('datatype')[:4]:
+            yield item
