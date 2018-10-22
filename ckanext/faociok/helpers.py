@@ -13,6 +13,9 @@ from ckanext.faociok.models import Vocabulary, VocabularyTerm
 
 DEFAULT_LANG = config.get('ckan.locale_default')
 
+# makes order of datatype in get_datatype_items in fixed order 
+FAOCIOK_DATATYPE_FIXED = 'ckanext.faociok.datatype.fixed'
+
 def get_fao_datatype(name):
     lang = get_lang()
     term = VocabularyTerm.get(Vocabulary.VOCABULARY_DATATYPE, name)
@@ -138,3 +141,19 @@ def get_url_for_location(location_code):
     label = term.get_label(lang).label or term.get_label('en').label
     qdict = {'fao_m49_regions_l{}_{}'.format(term.depth, lang): label}
     return h.url_for('search', **qdict)
+
+
+# defined by https://github.com/geosolutions-it/C013-FAO-CIOK-CKAN/issues/36
+# National time Series, Microdata, Geospatial data, Other
+DATATYPES = ('timeseries', 'microdata', 'geospatial', 'other',)
+
+def get_datatype_items():
+    if t.asbool(config.get(FAOCIOK_DATATYPE_FIXED, 'false')):
+        dlist = get_vocabulary_items_annotated('datatype')
+        for d in DATATYPES:
+            for item in dlist:
+                if item['value'] == d:
+                    yield item
+    else:
+        for item in get_vocabulary_items_annotated('datatype')[:4]:
+            yield item
