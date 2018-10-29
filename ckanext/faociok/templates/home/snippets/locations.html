@@ -3,7 +3,7 @@
 <div class="container-fluid box">
   <div class="row-fluid">
     <div class="col-xs-12">
-      <h3 class="heading">{{ _('Locations') }}</h3>
+      <h3 class="heading">{{ _('Regions') }}</h3>
     </div>
   </div>
   <div class="row-fluid">
@@ -12,6 +12,8 @@
     {% set datatype_url=h.get_fao_url_for_location(dtype.value) %}
       <div class="fao-item-summary fao-item-m49-regions">
         <a href="{{ datatype_url }}" class="fao-item-header">
+          <div class="fao-item-thumbnail">
+          </div>
           <div class="fao-item-title"><h3 title="{{ dtype.text }}">{{ h.truncate(dtype.text, length=45, whole_word=True) }}</h3></div>
           <div class="fao-item-body">
             <div class="fao-item-body">

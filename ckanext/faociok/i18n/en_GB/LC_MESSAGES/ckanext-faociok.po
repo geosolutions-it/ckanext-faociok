@@ -1,18 +1,19 @@
-# Translations template for ckanext-faociok.
+# English (United Kingdom) translations for ckanext-faociok.
 # Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the ckanext-faociok
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-faociok 0.0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-10-29 12:39+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2018-10-29 12:43+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en_GB\n"
+"Language-Team: en_GB <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -162,11 +163,11 @@ msgstr ""
 #: ckanext/faociok/templates/home/snippets/about_text.html:6
 msgid ""
 "The Food and Agriculture Organization (FAO) is specialized agency of the "
-"United Nations that leads international efforts to defeat hunger. Our goal is"
-" to achieve food security for all and make sure that people have regular "
-"access to enough high-quality food to lead active, healthy lives. With over "
-"194 member states, FAO works in over 130 countries worldwide. We believe that"
-" everyone can play a part in ending hunger."
+"United Nations that leads international efforts to defeat hunger. Our "
+"goal is to achieve food security for all and make sure that people have "
+"regular access to enough high-quality food to lead active, healthy lives."
+" With over 194 member states, FAO works in over 130 countries worldwide. "
+"We believe that everyone can play a part in ending hunger."
 msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/about_text.html:8
@@ -212,11 +213,11 @@ msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:10
 msgid ""
-"The Monitoring and Analysing Food and Agricultural Policies (MAFAP) programme"
-" seeks to establish country owned and sustainable systems to monitor, "
-"analyse, and reform food and agricultural policies to enable more effective, "
-"efficient and inclusive policy frameworks in a growing number of developing "
-"and emerging economies."
+"The Monitoring and Analysing Food and Agricultural Policies (MAFAP) "
+"programme seeks to establish country owned and sustainable systems to "
+"monitor, analyse, and reform food and agricultural policies to enable "
+"more effective, efficient and inclusive policy frameworks in a growing "
+"number of developing and emerging economies."
 msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:20
@@ -226,8 +227,8 @@ msgstr ""
 #: ckanext/faociok/templates/home/snippets/static_links.html:25
 msgid ""
 "FAOSTAT provides free access to food and agriculture data for over 245 "
-"countries and territories and covers all FAO regional groupings from 1961 to "
-"the most recent year available."
+"countries and territories and covers all FAO regional groupings from 1961"
+" to the most recent year available."
 msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:35
@@ -236,8 +237,9 @@ msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:40
 msgid ""
-"AQUASTAT is FAO's global water information system, developed by the Land and "
-"Water Division. It is the most quoted source on global water statistics."
+"AQUASTAT is FAO's global water information system, developed by the Land "
+"and Water Division. It is the most quoted source on global water "
+"statistics."
 msgstr ""
 
 #: ckanext/faociok/templates/macros/faociok_form_macros.html:11
