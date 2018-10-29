@@ -7503,6 +7503,7 @@ textarea {
 }
 .toolbar .breadcrumb a {
   color: #0d6cac;
+  text-shadow: none;
 }
 @media (max-width: 767px) {
   .toolbar .breadcrumb {
@@ -8564,7 +8565,7 @@ h4 small {
   border-color: transparent;
 }
 .masthead .navigation {
-  margin-right: 20px;
+  margin-right: 0;
 }
 .masthead .navigation .nav-pills {
   margin-bottom: 0;
@@ -10658,15 +10659,26 @@ h5 {
   background-image: url('/base/images/faociok/fao-datatype-time-series.png');
 }
 
-.fao-datatype-corpo-monitoring .fao-item-thumbnail {
-  background-image: url('/base/images/faociok/fao-datatype-corpo-monitoring.png');
-}
-
-.fao-datatype-monitoring .fao-item-thumbnail {
-  background-image: url('/base/images/faociok/fao-datatype-corpo-monitoring.png');
-}
 .fao-datatype-other .fao-item-thumbnail {
   background-image: url('/base/images/faociok/fao-datatype-other.png');
+}
+
+.fao-item-m49-regions .fao-item-thumbnail {
+  background-image: url('/base/images/faociok/fao-regions-thumbnail.png');
+}
+
+.fao-footer-mafap-thumbnail {
+  background-image: url('/base/images/faociok/fao-footer-mafap.png');
+  background-size: 100% auto;
+}
+
+.fao-footer-faostat-thumbnail {
+  background-image: url('/base/images/faociok/fao-footer-faostat.png');
+  background-size: 100% auto;
+}
+
+.fao-footer-acquastat-thumbnail {
+  background-color: #3A4577;
 }
 
 /* fix */
@@ -10777,6 +10789,18 @@ h5 {
 .homepage.layout-1 .fao-static-links-footer h3 {
   font-weight: bold;
 }
+
+.homepage.layout-1 .fao-static-links-footer .row-fluid.invert a {
+  color: #ffffff;
+}
+
+.homepage.layout-1 .fao-static-links-footer .row-fluid.invert i {
+  color: #ffffff;
+}
+
+.homepage.layout-1 .fao-static-links-footer .row-fluid i {
+  font-weight: bold;
+}
 /* end home page */
 
 .masthead.navbar-static-top {
@@ -10844,4 +10868,35 @@ h5 {
   .language-header .lang-select-inline-list {
     display: none;
   }
+}
+
+/* about page */
+
+.fao-about-container {
+  display: flex;
+  min-height: 400px;
+  background: #0d6cac;
+  background: -moz-linear-gradient(-45deg, #0d6cac 0%, #1ea8e1 100%);
+  background: -webkit-linear-gradient(-45deg, #0d6cac 0%, #1ea8e1 100%);
+  background: linear-gradient(135deg, #0d6cac 0%, #1ea8e1 100%);
+  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.fao-about-img {
+  flex: 1;
+}
+
+.fao-about-thumbnail {
+  background: url('/base/images/faociok/fao-about.png');
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.fao-about-desc {
+  flex: 1;
+  padding: 30px;
+  color: #fff;
 }

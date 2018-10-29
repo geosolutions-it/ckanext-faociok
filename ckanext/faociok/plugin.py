@@ -13,6 +13,7 @@ from ckanext.faociok import helpers as h
 from ckanext.faociok import validators as v
 from ckanext.faociok import actions as a
 from ckanext.faociok.models import VocabularyTerm, Vocabulary
+from ckan.lib.plugins import DefaultTranslation
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ TRIM_LIMIT = 32 * 1024
 TRIM_SKIP_FOR_FIELDS = "author author_email child_of dependency_of depends_on derives_from has_derivation linked_from links_to maintainer maintainer_email notes res_description res_name text title urls ckan_url download_url groups license maintainer name notes organization url data_dict validated_data_dict".split(' ')
 TRIM_SKIP_FOR_FIELDS_WILDCHAR = 'extras_ res_extras_ vocab_'.split(' ')
 
-class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
+class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm, DefaultTranslation):
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDatasetForm)
@@ -44,6 +45,14 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm):
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IActions)
+    plugins.implements(plugins.ITranslation, inherit=True)
+
+    def i18n_domain(self):
+        '''Change the gettext domain handled by this plugin
+        This implementation assumes the gettext domain is
+        ckanext-{extension name}, hence your pot, po and mo files should be
+        named ckanext-{extension name}.mo'''
+        return 'ckanext-{name}'.format(name='faociok')
 
     # IConfigurer
 

@@ -1,18 +1,19 @@
-# Translations template for ckanext-faociok.
+# Spanish translations for ckanext-faociok.
 # Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the ckanext-faociok
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ckanext-faociok 0.0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-10-29 12:39+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2018-10-29 12:44+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,153 +21,155 @@ msgstr ""
 
 #: ckanext/faociok/models.py:74
 msgid "Vocabulary {} doesn't exist"
-msgstr ""
+msgstr "El vocabulario {} no existe"
 
 #: ckanext/faociok/models.py:210
 msgid "No term {} for vocabulary {}"
-msgstr ""
+msgstr "Sin término {} para vocabulario {}"
 
 #: ckanext/faociok/models.py:500
 msgid "Using {}"
-msgstr ""
+msgstr "Utilizando {}"
 
 #: ckanext/faociok/models.py:513
 #, python-format
 msgid "Parent column found at idx %s"
-msgstr ""
+msgstr "Columna principal encontrada en idx %s"
 
 #: ckanext/faociok/models.py:516
 #, python-format
 msgid "Term column found at idx %s"
-msgstr ""
+msgstr "olumna de término encontrada en idx %s\""
 
 #: ckanext/faociok/models.py:519
 #, python-format
 msgid "Column %s will not be stored"
-msgstr ""
+msgstr "La columna %s no será almacenada"
 
 #: ckanext/faociok/models.py:524
 msgid "Cannot use 'parent' colum if vocabulary that doesn't support relations"
 msgstr ""
+"No se puede usar la columna 'primaria' de vocabulario que no admite "
+"relaciones"
 
 #: ckanext/faociok/models.py:528
 msgid "Term column not found"
-msgstr ""
+msgstr "Columna de término no encontrada"
 
 #: ckanext/faociok/models.py:564
 #, python-format
 msgid "Postpoining %s term - no %s parent in db yet"
-msgstr ""
+msgstr "Posponer el término %s - no hay %s padre en db todavía"
 
 #: ckanext/faociok/models.py:574
 #, python-format
 msgid "ERROR: TERM NOT CREATED  vocab[%s] term[%s] data[%s]"
-msgstr ""
+msgstr "ERROR: TÉRMINO NO CREADO vocab[%s] term[%s] data[%s]"
 
 #: ckanext/faociok/plugin.py:132 ckanext/faociok/schema.py:24
 msgid "Data type"
-msgstr ""
+msgstr "Tipo de datos"
 
 #: ckanext/faociok/plugin.py:133 ckanext/faociok/schema.py:49
 #: ckanext/faociok/schema.py:55
 msgid "AGROVOC terms"
-msgstr ""
+msgstr "Términos de AGROVOC"
 
 #: ckanext/faociok/plugin.py:134
 #: ckanext/faociok/templates/home/snippets/locations.html:6
 msgid "Regions"
-msgstr ""
+msgstr "Regiones"
 
 #: ckanext/faociok/plugin.py:135
 msgid "Countries"
-msgstr ""
+msgstr "Países"
 
 #: ckanext/faociok/schema.py:26
 msgid "Select data type of dataset"
-msgstr ""
+msgstr "Seleccione el tipo de datos del conjunto de datos"
 
 #: ckanext/faociok/schema.py:37
 msgid "M49 Regions"
-msgstr ""
+msgstr "Regiones M49"
 
 #: ckanext/faociok/schema.py:43
 msgid "Regions according to UN M.49 Standard"
-msgstr ""
+msgstr "Regiones según norma UN M.49."
 
 #: ckanext/faociok/validators.py:20
 msgid "Term not valid"
-msgstr ""
+msgstr "Plazo no válido"
 
 #: ckanext/faociok/validators.py:23
 msgid "Invalid datatype value: {}: {}"
-msgstr ""
+msgstr "Valor de tipo de datos no válido: {}: {}"
 
 #: ckanext/faociok/validators.py:39 ckanext/faociok/validators.py:60
 msgid "Term not valid: {}"
-msgstr ""
+msgstr "Término no válido: {}"
 
 #: ckanext/faociok/validators.py:44
 msgid "Invalid AGROVOC term: {} {}"
-msgstr ""
+msgstr "Término AGROVOC no válido: {} {}"
 
 #: ckanext/faociok/validators.py:65
 msgid "Invalid m49 regions: {} {}"
-msgstr ""
+msgstr "Regiones m49 no válidas: {} {}"
 
 #: ckanext/faociok/validators.py:104
 msgid "Invalid list of values: {}"
-msgstr ""
+msgstr "Lista de valores no válida: {}"
 
 #: ckanext/faociok/commands/commands.py:56
 #: ckanext/faociok/commands/vocabulary.py:237
 msgid "ERROR: missing command"
-msgstr ""
+msgstr "ERROR: comando faltante"
 
 #: ckanext/faociok/commands/commands.py:64
 #: ckanext/faociok/commands/vocabulary.py:245
 msgid "ERROR: invalid command: {}"
-msgstr ""
+msgstr "ERROR: comando inválido: {}"
 
 #: ckanext/faociok/commands/commands.py:73
 #: ckanext/faociok/commands/vocabulary.py:254
 #, python-format
 msgid "Can't execute %s with args %s: %s"
-msgstr ""
+msgstr "No se puede ejecutar %s con args %s: %s"
 
 #: ckanext/faociok/commands/commands.py:75
 #: ckanext/faociok/commands/vocabulary.py:256
 msgid "Can't execute {} with args {}: {}"
-msgstr ""
+msgstr "No se puede ejecutar {} con argumentos {}: {}"
 
 #: ckanext/faociok/commands/vocabulary.py:50
 msgid "Vocabularies:"
-msgstr ""
+msgstr "Vocabularios:"
 
 #: ckanext/faociok/commands/vocabulary.py:52
 msgid "vocabulary name: {}"
-msgstr ""
+msgstr "nombre de vocabulario: {}"
 
 #: ckanext/faociok/commands/vocabulary.py:53
 msgid "  has relations: {}"
-msgstr ""
+msgstr "  tiene relaciones: {}"
 
 #: ckanext/faociok/commands/vocabulary.py:55
 msgid "[end of vocabularies list]"
-msgstr ""
+msgstr "[final de la lista de vocabularios]"
 
 #: ckanext/faociok/commands/vocabulary.py:84
 #: ckanext/faociok/commands/vocabulary.py:218
 msgid "loaded {} terms from {} to {} vocabulary"
-msgstr ""
+msgstr "términos {} cargados de {} a {} vocabulario"
 
 #: ckanext/faociok/templates/home/snippets/about_text.html:6
 msgid ""
 "The Food and Agriculture Organization (FAO) is specialized agency of the "
-"United Nations that leads international efforts to defeat hunger. Our goal is"
-" to achieve food security for all and make sure that people have regular "
-"access to enough high-quality food to lead active, healthy lives. With over "
-"194 member states, FAO works in over 130 countries worldwide. We believe that"
-" everyone can play a part in ending hunger."
+"United Nations that leads international efforts to defeat hunger. Our "
+"goal is to achieve food security for all and make sure that people have "
+"regular access to enough high-quality food to lead active, healthy lives."
+" With over 194 member states, FAO works in over 130 countries worldwide. "
+"We believe that everyone can play a part in ending hunger."
 msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/about_text.html:8
@@ -175,12 +178,12 @@ msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/categories.html:7
 msgid "Groups"
-msgstr ""
+msgstr "Los grupos"
 
 #: ckanext/faociok/templates/home/snippets/categories.html:11
 #: ckanext/faociok/templates/home/snippets/organizations.html:11
 msgid "See all"
-msgstr ""
+msgstr "Ver todo"
 
 #: ckanext/faociok/templates/home/snippets/categories.html:29
 #: ckanext/faociok/templates/home/snippets/data_types.html:22
@@ -188,7 +191,7 @@ msgstr ""
 #: ckanext/faociok/templates/home/snippets/organizations.html:29
 #, python-format
 msgid "%(dataset_count)s Dataset"
-msgstr ""
+msgstr "%(dataset_count)s Dataset"
 
 #: ckanext/faociok/templates/home/snippets/categories.html:31
 #: ckanext/faociok/templates/home/snippets/data_types.html:24
@@ -196,15 +199,15 @@ msgstr ""
 #: ckanext/faociok/templates/home/snippets/organizations.html:31
 #, python-format
 msgid "%(dataset_count)s Datasets"
-msgstr ""
+msgstr "%(dataset_count)s Datasets"
 
 #: ckanext/faociok/templates/home/snippets/data_types.html:6
 msgid "Data types"
-msgstr ""
+msgstr "Tipos de datos"
 
 #: ckanext/faociok/templates/home/snippets/organizations.html:7
 msgid "Organizations"
-msgstr ""
+msgstr "Organizaciones"
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:5
 msgid "MAFAP"
@@ -212,11 +215,11 @@ msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:10
 msgid ""
-"The Monitoring and Analysing Food and Agricultural Policies (MAFAP) programme"
-" seeks to establish country owned and sustainable systems to monitor, "
-"analyse, and reform food and agricultural policies to enable more effective, "
-"efficient and inclusive policy frameworks in a growing number of developing "
-"and emerging economies."
+"The Monitoring and Analysing Food and Agricultural Policies (MAFAP) "
+"programme seeks to establish country owned and sustainable systems to "
+"monitor, analyse, and reform food and agricultural policies to enable "
+"more effective, efficient and inclusive policy frameworks in a growing "
+"number of developing and emerging economies."
 msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:20
@@ -226,8 +229,8 @@ msgstr ""
 #: ckanext/faociok/templates/home/snippets/static_links.html:25
 msgid ""
 "FAOSTAT provides free access to food and agriculture data for over 245 "
-"countries and territories and covers all FAO regional groupings from 1961 to "
-"the most recent year available."
+"countries and territories and covers all FAO regional groupings from 1961"
+" to the most recent year available."
 msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:35
@@ -236,35 +239,36 @@ msgstr ""
 
 #: ckanext/faociok/templates/home/snippets/static_links.html:40
 msgid ""
-"AQUASTAT is FAO's global water information system, developed by the Land and "
-"Water Division. It is the most quoted source on global water statistics."
+"AQUASTAT is FAO's global water information system, developed by the Land "
+"and Water Division. It is the most quoted source on global water "
+"statistics."
 msgstr ""
 
 #: ckanext/faociok/templates/macros/faociok_form_macros.html:11
 msgid "This field is required"
-msgstr ""
+msgstr "este campo es requerido"
 
 #: ckanext/faociok/templates/macros/faociok_form_macros.html:11
 msgid "Custom"
-msgstr ""
+msgstr "Personalizado"
 
 #: ckanext/faociok/templates/package/snippets/faociok_additional_info.html:2
 msgid "Dataset Metadata"
-msgstr ""
+msgstr "Metadatos del conjunto de datos"
 
 #: ckanext/faociok/templates/package/snippets/faociok_additional_info.html:20
 msgid "Region"
-msgstr ""
+msgstr "Región"
 
 #: ckanext/faociok/templates/package/snippets/faociok_additional_info.html:30
 msgid "AGROVOC term"
-msgstr ""
+msgstr "Termino AGROVOC"
 
 #: ckanext/faociok/templates/package/snippets/share_formats.html:2
 msgid "Share metadata"
-msgstr ""
+msgstr "Compartir metadatos"
 
 #: ckanext/faociok/templates/snippets/language_selector.html:12
 msgid "Go"
-msgstr ""
+msgstr "Ir"
 
