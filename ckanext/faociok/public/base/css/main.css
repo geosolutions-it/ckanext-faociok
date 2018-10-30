@@ -5951,13 +5951,16 @@ a.tag:hover {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  -moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 .media-view:hover,
 .media-view.hovered {
   border-color: transparent;
-  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
-  -moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
-  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  -moz-box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 .media-view:hover .banner,
 .media-view.hovered .banner {
@@ -8299,6 +8302,9 @@ h4 small {
   margin: 20px 0 0 0;
   color: #fff;
   background: #fff;
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  -moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 .homepage .module-search .search-giant {
   margin-bottom: 10px;
@@ -10687,6 +10693,9 @@ h5 {
   transition: box-shadow 0.3s;
   overflow: hidden;
   margin-right: 0;
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  -moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
 .homepage.layout-1 .fao-item-summary a:hover {
@@ -10696,9 +10705,9 @@ h5 {
 .homepage.layout-1 .fao-item-summary .fao-item-thumbnail {
   height: 100px;
   background-color: #dddddd;
-  background-size: 100% auto;
+  background-size: cover;
   background-position: center;
-
+  background-repeat: no-repeat;
 }
 
 .homepage.layout-1 .fao-item-summary .fao-item-body {
@@ -10728,9 +10737,9 @@ h5 {
 }
 
 .homepage.layout-1 .fao-item-summary:hover {
-  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
-  -moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
-  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  -moz-box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
 .homepage.layout-1 .col1 .module-content .row {
@@ -10808,6 +10817,14 @@ h5 {
   background-color: #eeeeee;
 }
 
+.navbar-static-top.masthead.language-header + .masthead.navbar-static-top {
+  z-index: 1;
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  -moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  position: relative;
+}
+
 .masthead.navbar-logo {
   color: #fff;
   background: #0d6cac;
@@ -10821,13 +10838,18 @@ h5 {
   padding: 10px;
   padding-right: 0;
 }
+.lang-select-inline-list {
+  overflow: hidden;
+  margin-right: 10px;
+}
 .lang-select-inline-list > div {
   float: left;
 }
 .lang-select-inline-list > div > a {
   font-weight: normal;
   color: #5191c8;
-  margin: 0 10px;
+  padding-right: 17px;
+  margin-right: 2px;
   text-transform: capitalize;
   font-size: 12px;
   text-decoration: none;
@@ -10879,9 +10901,9 @@ h5 {
   background: -moz-linear-gradient(-45deg, #0d6cac 0%, #1ea8e1 100%);
   background: -webkit-linear-gradient(-45deg, #0d6cac 0%, #1ea8e1 100%);
   background: linear-gradient(135deg, #0d6cac 0%, #1ea8e1 100%);
-  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
-  -moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
-  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  -moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
 .fao-about-img {
