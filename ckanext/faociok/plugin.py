@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import logging
+import collections
 import json
 
 from ckan import plugins
@@ -23,7 +24,7 @@ log = logging.getLogger(__name__)
 # alternatively you can declare field in solr schema manually as text (replace $field_name
 # with actual field name):
 #   <field name="$field_name" type="text" multiValued="false" indexed="true" stored="false"/>
-# and set ckanext.faociok.trim_for_index to false. 
+# and set ckanext.faociok.trim_for_index to false.
 #
 # default - true
 CONFIG_TRIM_FOR_INDEX = 'ckanext.faociok.trim_for_index'
@@ -68,7 +69,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm, DefaultTransl
         # Return True to register this plugin as the default handler for
         # package types not handled by any other IDatasetForm plugin.
         return True
-        
+
     def package_types(self):
         # This plugin doesn't handle any special package types, it just
         # registers itself as the default (above).
@@ -138,12 +139,17 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm, DefaultTransl
     # IFacets
     def dataset_facets(self, facets_dict, package_type):
         lang = get_lang()
-        facets_dict['fao_datatype_{}'.format(lang)] = t._("Data type")
+
+        head_facets_dict = collections.OrderedDict([])
+        head_facets_dict['fao_datatype_{}'.format(lang)] = t._("Data type")
+
         facets_dict['fao_agrovoc_{}'.format(lang)] = t._("AGROVOC terms")
         for idx, l in ((0, t._("Regions"),),
                        (1, t._("Countries"),)):
             facets_dict['fao_m49_regions_l{}_{}'.format(idx, lang)] = l
-            
+
+        facets_dict = collections.OrderedDict(list(head_facets_dict.items()) + list(facets_dict.items()))
+
         return facets_dict
 
     # IPackageController
@@ -195,7 +201,7 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm, DefaultTransl
         return out
 
     def before_index(self, pkg_dict):
-        
+
         regions = pkg_dict.get('fao_m49_regions')
         if regions:
             if not isinstance(regions, list):
@@ -206,11 +212,11 @@ class FaociokPlugin(plugins.SingletonPlugin, t.DefaultDatasetForm, DefaultTransl
             localized_datatype = self.get_localized_datatype(pkg_dict['fao_datatype'])
             pkg_dict.update(localized_datatype)
         if pkg_dict.get('fao_agrovoc'):
-            
+
             localized_agrovoc = self.get_localized_agrovoc(pkg_dict['fao_agrovoc'])
             pkg_dict.update(localized_agrovoc)
 
-        # optional trim values to 32k field size limit 
+        # optional trim values to 32k field size limit
         if TRIM_FOR_INDEX:
             for k, val in pkg_dict.iteritems():
                 # skip known text fields
