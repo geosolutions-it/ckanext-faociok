@@ -297,6 +297,10 @@ To install ckanext-pdfview:
         ckan.plugins = ... pdf_view
         
 3. Restart CKAN
+
+**note:** The final plugins configuration list should be something like the following:
+
+        ckan.plugins = stats text_view image_view recline_view pdf_view datastore resource_proxy geo_view geojson_view wmts_view tableau_view  harvest ckan_harvester dcat dcat_json_interface dcat_rdf_harvester dcat_json_harvester faociok faociok_nada_harvester
         
 ## Development Installation
 
