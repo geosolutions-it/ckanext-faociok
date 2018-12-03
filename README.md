@@ -22,7 +22,7 @@
 * [ckanext-tableauview](https://github.com/geosolutions-it/ckanext-tableauview) (to display tableau vizzes in CKAN)
 * [ckanext-geoview](https://github.com/ckan/ckanext-geoview) (to display geospatial files and services in CKAN)
 * [ckanext-pdfview](https://github.com/ckan/ckanext-pdfview) (to provide a view plugin for PDF files using PDF.js)
-* [ckanext-spatial](https://github.com/ckan/ckanext-spatial)(to add geospatial capabilities to CKAN)
+* [ckanext-spatial](https://github.com/ckan/ckanext-spatial) (to add geospatial capabilities to CKAN)
 
 ## Provides
 
