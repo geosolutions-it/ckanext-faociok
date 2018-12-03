@@ -22,6 +22,7 @@
 * [ckanext-tableauview](https://github.com/geosolutions-it/ckanext-tableauview) (to display tableau vizzes in CKAN)
 * [ckanext-geoview](https://github.com/ckan/ckanext-geoview) (to display geospatial files and services in CKAN)
 * [ckanext-pdfview](https://github.com/ckan/ckanext-pdfview) (to provide a view plugin for PDF files using PDF.js)
+* [ckanext-spatial](https://github.com/ckan/ckanext-spatial)(to add geospatial capabilities to CKAN)
 
 ## Provides
 
@@ -317,10 +318,83 @@ To install ckanext-pdfview:
         
 3. Restart CKAN
 
+### Spatial ([ckanext-spatial](https://github.com/ckan/ckanext-spatial))
+
+This extension contains plugins that add geospatial capabilities to CKAN.
+
+#### Installation
+
+To install ckanext-spatial:
+
+1. Activate your CKAN virtual environment, for example:
+
+        . /usr/lib/ckan/default/bin/activate
+
+2. Install the ckanext-spatial Python package into your virtual environment:
+
+        cd ckanext-spatial
+        pip install -e .
+        pip install -r pip-requirements.txt
+        
+3. Init spatial DB:
+
+        (pyenv)$ cd /usr/lib/ckan/default/src/ckan
+        (pyenv)$ paster --plugin=ckanext-spatial spatial initdb 4326 --config=/etc/ckan/default/production.ini
+
+#### Configuration
+
+1. Add the spatial plugins to the `ckan.plugins` setting:
+
+        ckan.plugins = ... spatial_metadata spatial_query csw_harvester
+    
+2. You may also specify the default SRID:
+
+        ckan.spatial.srid = 4326
+        
+3. You may force the validation profiles when harvesting:
+
+        ckan.spatial.validator.profiles = iso19139,gemini2,constraints
+
+4. CKAN stops on validation errors by default. If you want to import also metadata that fails the XSD validation you need to add this line to the .ini file:
+
+        ckanext.spatial.harvest.continue_on_validation_errors = True
+        
+This same behavior can also be defined on a per-source base, setting continue_on_validation_errors in the source configuration.
+
+5. Edit file `/etc/ckan/default/production.ini` and add this line to configure the spatial backend:
+
+        ckanext.spatial.search_backend = solr
+
+6. Edit the Solr schema file (remember, it’s a symlink):
+
+        vim /etc/solr/ckan/conf/schema.xml
+        
+7. Add the field elements:
+
+        <fields>
+           <!-- ... -->
+           <field name="bbox_area" type="float" indexed="true" stored="true" />
+           <field name="maxx" type="float" indexed="true" stored="true" />
+           <field name="maxy" type="float" indexed="true" stored="true" />
+           <field name="minx" type="float" indexed="true" stored="true" />
+           <field name="miny" type="float" indexed="true" stored="true" />
+        </fields>
+        
+8. Then update Solr clause configuration. As `root`, edit the file `/etc/solr/ckan/conf/solrconfig.xml` and update the value of `maxBooleanClauses` to `16384`.
+
+9. Restart Solr to make it read the config changes
+
+10. Restart CKAN
+
+11. If your CKAN instance already contained spatial datasets, you may want to reindex the catalog:
+
+        . /usr/lib/ckan/default/bin/activate
+        paster --plugin=ckan search-index rebuild_fast --config=/etc/ckan/default/production.ini
+
 **note:** The final plugins configuration list should be something like the following:
 
-        ckan.plugins = stats text_view image_view recline_view pdf_view datastore resource_proxy geo_view geojson_view wmts_view tableau_view  harvest ckan_harvester dcat dcat_json_interface dcat_rdf_harvester dcat_json_harvester faociok faociok_nada_harvester
-        
+        ckan.plugins = stats text_view image_view recline_view pdf_view datastore spatial_metadata spatial_query csw_harvester resource_proxy geo_view geojson_view wmts_view tableau_view harvest ckan_harvester dcat dcat_json_interface dcat_rdf_harvester dcat_json_harvester faociok faociok_nada_harvester
+       
 ## Development Installation
 
 To install ckanext-faociok for development, activate your CKAN virtualenv and
