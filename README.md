@@ -20,8 +20,8 @@
 * [ckanext-ddi](https://github.com/geosolutions-it/ckanext-ddi) (to harvest NADA Catalogs)
 * [ckanext-dcat](https://github.com/ckan/ckanext-dcat) (to expose and consume metadata from other catalogs using RDF documents serialized using DCAT)
 * [ckanext-tableauview](https://github.com/geosolutions-it/ckanext-tableauview) (to display tableau vizzes in CKAN)
-* [ckanext-geoview](https://github.com/ckan/ckanext-geoview)(to display geospatial files and services in CKAN)
-* [ckanext-pdfview](https://github.com/ckan/ckanext-pdfview)(to provide a view plugin for PDF files using PDF.js)
+* [ckanext-geoview](https://github.com/ckan/ckanext-geoview) (to display geospatial files and services in CKAN)
+* [ckanext-pdfview](https://github.com/ckan/ckanext-pdfview) (to provide a view plugin for PDF files using PDF.js)
 
 ## Provides
 
@@ -99,13 +99,13 @@ After ingesting new version of AGROVOC, you should run Solr reindexing. This is 
         
 ## Install Other Extensions
 
-### Harvest (ckanext-harvest)
+### Harvest ([ckanext-harvest](https://github.com/ckan/ckanext-harvest))
 
 This extension provides a common harvesting framework for ckan extensions and adds a CLI and a WUI to CKAN to manage harvesting sources and jobs.
 
 Installation steps are described in the [extension's repository](https://github.com/ckan/ckanext-harvest#installation)
 
-### DDI Harvester (ckanext-ddi)
+### DDI Harvester ([ckanext-ddi](https://github.com/geosolutions-it/ckanext-ddi))
 
 FAO-CIOK extension comes with DDI harvester which will add FAO-CIOK-specific fields to dataset based on harvested data. Harvester is available as `faociok_nada_harvester`, and requires `ckanext-ddi extension <https://github.com/geosolutions-it/ckanext-ddi>` to be installed to run properly. This harvester is available as **FAO/NADA harvester for DDI**.
 
@@ -149,6 +149,8 @@ To install ckanext-ddi:
 
         {"access_type":""}
 
+6. Restart CKAN
+
 #### Vocabulary term migration
 
 In case of a need of bulk change of one term to another for specific vocabulary, this can be done in the following way:
@@ -183,9 +185,11 @@ When using FAO/NADA harvester, some ddi-specific fields in dataset may be large 
 
           <field name="$field_name" type="text" multiValued="false" indexed="true" stored="false"/>
 
-### DCAT (ckanext-dcat)
+### DCAT ([ckanext-dcat](https://github.com/ckan/ckanext-dcat))
 
 This extension provides plugins that allow CKAN to expose and consume metadata from other catalogs using RDF documents serialized using DCAT. 
+
+#### Installation
 
 To install ckanext-dcat:
 
@@ -212,9 +216,13 @@ To install ckanext-dcat:
         ckanext.dcat.expose_subcatalogs = False
         ckanext.dcat.clean_tags = True
         
-### Tableau Viewer (ckanext-tableauview)
+3. Restart CKAN
+        
+### Tableau Viewer ([ckanext-tableauview](https://github.com/geosolutions-it/ckanext-tableauview))
 
 This extension contains a view plugin to display tableau vizzes in CKAN.
+
+#### Installation
 
 To install ckanext-tableauview:
 
@@ -232,9 +240,13 @@ To install ckanext-tableauview:
 
         ckan.plugins = ... tableau_view
         
-### GeoView (ckanext-geoview)
+2. Restart CKAN
+        
+### GeoView ([ckanext-geoview](https://github.com/ckan/ckanext-geoview))
 
 This extension contains view plugins to display geospatial files and services in CKAN. 
+
+#### Installation
 
 To install ckanext-geoview:
 
@@ -255,10 +267,14 @@ To install ckanext-geoview:
 2. Add the required plugins to `ckan.plugins` in configuration:
 
         ckan.plugins = ... geo_view geojson_view wmts_view 
+
+3. Restart CKAN
         
-### PDFView (ckanext-pdfview)
+### PDFView ([ckanext-pdfview](https://github.com/ckan/ckanext-pdfview))
 
 This extension provides a view plugin for PDF files using PDF.js.
+
+#### Installation
 
 To install ckanext-pdfview:
 
@@ -279,6 +295,8 @@ To install ckanext-pdfview:
 2. Add the required plugins to `ckan.plugins` in configuration:
 
         ckan.plugins = ... pdf_view
+        
+3. Restart CKAN
         
 ## Development Installation
 
