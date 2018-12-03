@@ -48,20 +48,34 @@ To install ckanext-faociok:
 3. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
+   
+4. Add the needed configuration properties to the ``production.ini`` file:
 
-4. Update the DB using the ``initdb`` command:
+        ckanext.faociok.datatype = other
+        ckanext.faociok.trim_for_index = true
+        ckanext.faociok.datatype.fixed = true
+        
+   Enable only the supported languages:
+   
+       ## Internationalisation Settings
+       ckan.locale_default = en
+       ckan.locale_order = en es fr
+       ckan.locales_offered = en es fr
+       ckan.locales_filtered_out = en_GB
+
+5. Update the DB using the ``initdb`` command:
  
         paster --plugin=ckanext-faociok faociok initdb --config=/etc/ckan/default/production.ini
      
-5. Load the M49 vocabulary:
+6. Load the M49 vocabulary:
 
         paster --plugin=ckanext-faociok vocabulary import_m49 files/M49_Codes.xlsx --config=/etc/ckan/default/production.ini
 
-6. Load the datatypes codelist:
+7. Load the datatypes codelist:
 
         paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini   
 
-7. Load AGROVOC vocabulary. **Important note:** `clean_agrovoc.sh` script is used to clean agrovoc file from unused triplets, so amount of data to parse is lower. Without it, ingestion script would use far more memory and time to process rdf file:
+8. Load AGROVOC vocabulary. **Important note:** `clean_agrovoc.sh` script is used to clean agrovoc file from unused triplets, so amount of data to parse is lower. Without it, ingestion script would use far more memory and time to process rdf file:
 
         cd ckanext-faociok/files    
         wget http://agrovoc.uniroma2.it/agrovocReleases/agrovoc_2018-09-03_lod.nt.zip
@@ -78,18 +92,18 @@ Internally, each ingestion invocation removes existing terms and replaces with f
 
 After ingesting new version of AGROVOC, you should run Solr reindexing. This is because indexed data don't refer to labels directly, they use local copy from the moment of idexation. This can lead to problems like displaying outdated term names in facets. Reindexation will refresh that data. 
     
-8. Update SOLR `schema.xml` and add fields:
+9. Update SOLR `schema.xml` and add fields:
 
        <dynamicField name="fao_m49_regions*" type="string" multiValued="true" indexed="true" stored="false"/>
        <dynamicField name="fao_agrovoc*" type="string" multiValued="true" indexed="true" stored="false"/>
    
-9. Restart SOLR
+10. Restart SOLR
 
-10. Reindex data in solr (optional, if you're upgrading AGROVOC):
+11. Reindex data in solr (optional, if you're upgrading AGROVOC):
 
         paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
 
-11. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+12. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
         sudo service apache2 reload
 
@@ -267,6 +281,11 @@ To install ckanext-geoview:
 2. Add the required plugins to `ckan.plugins` in configuration:
 
         ckan.plugins = ... geo_view geojson_view wmts_view 
+
+3. Add the needed geoview configuration properties:
+
+        ckan.views.default_views = ... geo_view geojson_view wmts_view
+        ckanext.geoview.ol_viewer.formats = wms wfs gml arcgis_rest
 
 3. Restart CKAN
         
