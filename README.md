@@ -13,8 +13,15 @@
 
 ## Requirements
 
-* CKAN 2.5+
-* ckanext-ddi (if harvester is in use)
+* CKAN 2.5+ (tested with CKAN 2.6.3)
+
+### Other Extensions
+* [ckanext-harvest](https://github.com/ckan/ckanext-harvest) (to provide a common harvesting framework for ckan extensions)
+* [ckanext-ddi](https://github.com/geosolutions-it/ckanext-ddi) (to harvest NADA Catalogs)
+* [ckanext-dcat](https://github.com/ckan/ckanext-dcat) (to expose and consume metadata from other catalogs using RDF documents serialized using DCAT)
+* [ckanext-tableauview](https://github.com/geosolutions-it/ckanext-tableauview) (to display tableau vizzes in CKAN)
+* [ckanext-geoview](https://github.com/ckan/ckanext-geoview)(to display geospatial files and services in CKAN)
+* [ckanext-pdfview](https://github.com/ckan/ckanext-pdfview)(to provide a view plugin for PDF files using PDF.js)
 
 ## Provides
 
@@ -32,9 +39,11 @@ To install ckanext-faociok:
 
         . /usr/lib/ckan/default/bin/activate
 
-2. Install the ckanext-faociok Python package into your virtual environment::
+2. Install the ckanext-faociok Python package into your virtual environment:
 
-        pip install ckanext-faociok
+        cd ckanext-faociok
+        pip install -r requirements.txt
+        pip install -e .
 
 3. Add ``faociok`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
@@ -50,7 +59,7 @@ To install ckanext-faociok:
 
 6. Load the datatypes codelist:
 
-        paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini     
+        paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini   
 
 7. Load AGROVOC vocabulary. **Important note:** `clean_agrovoc.sh` script is used to clean agrovoc file from unused triplets, so amount of data to parse is lower. Without it, ingestion script would use far more memory and time to process rdf file:
 
@@ -62,8 +71,11 @@ To install ckanext-faociok:
 
 **note:** You can replace timestamp with newer release. Check for newer AGROVOC Releases at http://aims.fao.org/node/121112 and see http://aims.fao.org/vest-registry/vocabularies/agrovoc for general information about accessing AGROVOC.
 Mind that AGROVOC contains lot of data (over 30000 terms and around 500000 translated labels). File parsing and import will take ~10-20 minutes, depending on your hardware.
+
 You should be able to update AGROVOC vocabulary just by providing to the script new version of RDF (mind that it should be in .nt format) from provided URLs.
+
 Internally, each ingestion invocation removes existing terms and replaces with full set of new ones. This is processed within one transaction in database, so there should be no side-effects in running application (except for small slowdown for time of parsing and inserting new terms).
+
 After ingesting new version of AGROVOC, you should run Solr reindexing. This is because indexed data don't refer to labels directly, they use local copy from the moment of idexation. This can lead to problems like displaying outdated term names in facets. Reindexation will refresh that data. 
     
 8. Update SOLR `schema.xml` and add fields:
@@ -73,9 +85,6 @@ After ingesting new version of AGROVOC, you should run Solr reindexing. This is 
    
 9. Restart SOLR
 
-        cd /solr/bin/dir
-        ./solr restart -p SOLR_PORT
-
 10. Reindex data in solr (optional, if you're upgrading AGROVOC):
 
         paster --plugin=ckan search-index rebuild --config=/etc/ckan/default/production.ini
@@ -84,17 +93,39 @@ After ingesting new version of AGROVOC, you should run Solr reindexing. This is 
 
         sudo service apache2 reload
 
-   If CKAN is managed through supervisor:
+    If CKAN is managed through supervisor:
 
         systemctl restart supervisord 
+        
+## Install Other Extensions
 
-## DDI Harvester
+### Harvest (ckanext-harvest)
+
+This extension provides a common harvesting framework for ckan extensions and adds a CLI and a WUI to CKAN to manage harvesting sources and jobs.
+
+Installation steps are described in the [extension's repository](https://github.com/ckan/ckanext-harvest#installation)
+
+### DDI Harvester (ckanext-ddi)
 
 FAO-CIOK extension comes with DDI harvester which will add FAO-CIOK-specific fields to dataset based on harvested data. Harvester is available as `faociok_nada_harvester`, and requires `ckanext-ddi extension <https://github.com/geosolutions-it/ckanext-ddi>` to be installed to run properly. This harvester is available as **FAO/NADA harvester for DDI**.
 
 **note:** To fully benefit from this harvester, you should have all vocabularies imported.
+
+#### Installation
+
+To install ckanext-ddi:
+
+1. Activate your CKAN virtual environment, for example:
+
+        . /usr/lib/ckan/default/bin/activate
+
+2. Install the ckanext-ddi Python package into your virtual environment:
+
+        cd ckanext-ddi
+        pip install -r requirements.txt
+        pip install -e .
     
-## Configuration
+#### Configuration
 
 1. Add `faociok_nada_harvester` to `ckan.plugins` in configuration:
 
@@ -102,7 +133,7 @@ FAO-CIOK extension comes with DDI harvester which will add FAO-CIOK-specific fie
 
 2. Add DDI-specific configuration to your ckan configuration file:
     
-        ckanext.ddi.default_license = CC0-1.0
+        ckanext.ddi.default_license =
         ckanext.ddi.allow_duplicates = False
         ckanext.ddi.override_datasets = False
 
@@ -118,7 +149,7 @@ FAO-CIOK extension comes with DDI harvester which will add FAO-CIOK-specific fie
 
         {"access_type":""}
 
-## Vocabulary term migration
+#### Vocabulary term migration
 
 In case of a need of bulk change of one term to another for specific vocabulary, this can be done in the following way:
 
@@ -130,10 +161,9 @@ In case of a need of bulk change of one term to another for specific vocabulary,
 
     paster --plugin=ckanext-faociok vocabulary load datatype files/faociok.datatype.csv  --config=/etc/ckan/default/production.ini  
 
-
 **note:** Both terms should be present in vocabulary during term migration.
 
-## Deployment notes
+#### Deployment notes
 
 When using FAO/NADA harvester, some ddi-specific fields in dataset may be large (especially `sampling_procedure_notes`). This is rather unfrequent situation, but it may cause error during indexation in Solr. CKAN tries to put all fields from dataset into index, including extra fields, so those fields also qualify. However, default field type is string, which can hold up to 32k of text. See `Solr Fields Ref, StrField <https://lucene.apache.org/solr/guide/6_6/field-types-included-with-solr.html>`. This can cause exceptions during indexing. We suggest two approaches to manage this:
 
@@ -153,6 +183,103 @@ When using FAO/NADA harvester, some ddi-specific fields in dataset may be large 
 
           <field name="$field_name" type="text" multiValued="false" indexed="true" stored="false"/>
 
+### DCAT (ckanext-dcat)
+
+This extension provides plugins that allow CKAN to expose and consume metadata from other catalogs using RDF documents serialized using DCAT. 
+
+To install ckanext-dcat:
+
+1. Activate your CKAN virtual environment, for example:
+
+        . /usr/lib/ckan/default/bin/activate
+
+2. Install the ckanext-dcat Python package into your virtual environment:
+
+        cd ckanext-dcat
+        pip install -r requirements.txt
+        pip install -e .
+
+#### Configuration
+
+1. Add the required plugins to `ckan.plugins` in configuration:
+
+        ckan.plugins = ... dcat dcat_json_interface dcat_rdf_harvester dcat_json_harvester
+
+2. Configure the needed dcat extension proeprties:
+
+        ckanext.dcat.rdf.profiles = euro_dcat_ap
+        ckanext.dcat.base_uri = http://your_base_uri/
+        ckanext.dcat.expose_subcatalogs = False
+        ckanext.dcat.clean_tags = True
+        
+### Tableau Viewer (ckanext-tableauview)
+
+This extension contains a view plugin to display tableau vizzes in CKAN.
+
+To install ckanext-tableauview:
+
+1. Activate your CKAN virtual environment, for example:
+
+        . /usr/lib/ckan/default/bin/activate
+
+2. Install the ckanext-tableauview Python package into your virtual environment:
+
+        pip install ckanext-tableauview
+
+#### Configuration
+
+1. Add the required plugins to `ckan.plugins` in configuration:
+
+        ckan.plugins = ... tableau_view
+        
+### GeoView (ckanext-geoview)
+
+This extension contains view plugins to display geospatial files and services in CKAN. 
+
+To install ckanext-geoview:
+
+1. Activate your CKAN virtual environment, for example:
+
+        . /usr/lib/ckan/default/bin/activate
+
+2. Install the ckanext-geoview Python package into your virtual environment:
+
+        pip install ckanext-geoview
+
+#### Configuration
+
+1. Add the resource_proxy plugin to the ckan.plugins setting:
+
+        ckan.plugins = ... resource_proxy 
+        
+2. Add the required plugins to `ckan.plugins` in configuration:
+
+        ckan.plugins = ... geo_view geojson_view wmts_view 
+        
+### PDFView (ckanext-pdfview)
+
+This extension provides a view plugin for PDF files using PDF.js.
+
+To install ckanext-pdfview:
+
+1. Activate your CKAN virtual environment, for example:
+
+        . /usr/lib/ckan/default/bin/activate
+
+2. Install the ckanext-pdfview Python package into your virtual environment:
+
+        pip install ckanext-pdfview
+
+#### Configuration
+
+1. Add the resource_proxy plugin to the ckan.plugins setting:
+
+        ckan.plugins = ... resource_proxy 
+        
+2. Add the required plugins to `ckan.plugins` in configuration:
+
+        ckan.plugins = ... pdf_view
+        
 ## Development Installation
 
 To install ckanext-faociok for development, activate your CKAN virtualenv and
